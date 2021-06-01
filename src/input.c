@@ -1,13 +1,10 @@
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
 #include "input.h"
 #include "output.h"
+#include "utils.h"
 
-// Size for 'type' and pointer for Element
-#define ELEMENT_MIN_SIZE 32
 #define BUFFER_SIZE 128
 
 int peek(void) {
@@ -15,48 +12,13 @@ int peek(void) {
   ungetc(c, stdin);
   return c;
 }
+
 int end_of_element(char c) {
   if (c == ' ' || c == EOF || c == '\r' || c == '\n') {
     return 1;
   } else {
     return 0;
   }
-}
-
-Element *alloc(int type, size_t size) {
-  // This might allocate a little bit more memory than needed
-  // Because the last 8 bytes of Element struct were only used by str_v[1]
-  // Possible to save 6-7 bytes by some optimization
-  size += ELEMENT_MIN_SIZE;
-  Element *ele = malloc(size);
-  ele->type = type;
-  return ele;
-}
-
-Element *make_integer(char *buffer) {
-  Element *ele = alloc(TV_INT, sizeof(int));
-  ele->int_v = atoi(buffer);
-  return ele;
-}
-
-Element *make_string(char *buffer) {
-  Element *ele = alloc(TV_STRING, strlen(buffer) + 1);
-  strcpy(ele->str_v, buffer);
-  return ele;
-}
-
-Element *make_expression(char *buffer) {
-  // TODO: make real expression
-  Element *ele = alloc(T_EXPRESSION, strlen(buffer) + 1);
-  strcpy(ele->str_v, buffer);
-  return ele;
-}
-
-Element *make_symbol(char *buffer) {
-  // TODO: validate symbol
-  Element *ele = alloc(T_SYMBOL, strlen(buffer) + 1);
-  strcpy(ele->str_v, buffer);
-  return ele;
 }
 
 Element *read_element(char s) {
@@ -76,7 +38,7 @@ Element *read_element(char s) {
         if (strlen(buffer) == 1 && buffer[0] == '-') {
           return make_symbol(buffer);
         } else {
-          return make_integer(buffer);
+          return make_integer(atoi(buffer));
         }
       } else {
         return make_symbol(buffer);
@@ -180,10 +142,7 @@ Element *read_expression(int with_paren) {
     if (!ele) {
       // Do nothing
     } else if (!head) {
-      head = ele;
-    } else if (!tail) {
-      tail = ele;
-      head->args = tail;
+      head = tail = ele;
     } else {
       tail->next = ele;
       tail = ele;

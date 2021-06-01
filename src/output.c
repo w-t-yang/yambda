@@ -1,5 +1,4 @@
 #include <stdarg.h>
-#include <stdlib.h>
 #include <stdio.h>
 
 #include "output.h"
@@ -14,17 +13,17 @@ void error(char *fmt, ...) {
 }
 
 void debug(char *fmt, ...){
-  #ifndef DEBUG
-  return;
-  #endif
+  //ifndef DEBUG
+  //return;
+  //endif
   va_list ap;
   va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
-  fprintf(stderr, "\n");
+  vfprintf(stdout, fmt, ap);
+  fprintf(stdout, "\n");
   va_end(ap);
 }
 
-void print_element(Element *ele) {
+void print_ele(Element *ele) {
   if (!ele) {
     printf("<Null>");
   } else if ( ele->type == T_EXPRESSION) {
@@ -41,12 +40,21 @@ void print_element(Element *ele) {
 }
 
 void print_list(Element *curr) {
-  print_element(curr);
-  curr = curr->args;
-
   while (curr) {
-    print_element(curr);
+    print_ele(curr);
     curr = curr->next;
   }
   printf("\n");
+}
+
+void print_env(Env *env) {
+  printf("Printing ENV: \n");
+
+  Env *curr = env;
+  while (curr) {
+    printf("%s -> ", curr->symbol);
+    print_list(curr->list);
+    curr = curr->next;
+  }
+  printf("End of ENV\n");
 }

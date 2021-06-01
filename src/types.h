@@ -1,6 +1,10 @@
 #ifndef YAMBDA_TYPES
 #define YAMBDA_TYPES
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 enum {
   // Types of element
   // Expression type should be eliminated
@@ -22,5 +26,18 @@ struct element{
 };
 
 typedef struct element Element;
+
+struct env{
+  struct env *next;     // 8 bytes
+  struct element *list; // 8 bytes
+  char symbol[1];
+};
+typedef struct env Env;
+
+#define streq(x, y) !strcmp(x, y)
+
+#define ARGS_SYMBOL "@_"
+
+static int ERROR_FLAG = 0;
 
 #endif

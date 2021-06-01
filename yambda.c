@@ -1,35 +1,33 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "src/types.h"
+#include "src/env.h"
 #include "src/input.h"
 #include "src/output.h"
+#include "src/primitives.h"
+#include "src/types.h"
+
+#define try ERROR_FLAG=0;
+#define catch(x) EXIT_POINT: if(ERROR_FLAG)
+#define throw(x) ERROR_FLAG=1;goto EXIT_POINT;
 
 int main(int argc, char **argv) {
-  // Debug flags
-  //debug_gc = getEnvFlag("MINILISP_DEBUG_GC");
-  //always_gc = getEnvFlag("MINILISP_ALWAYS_GC");
+  Env *env = env_init();
 
-  // Memory allocation
-  //memory = alloc_semispace();
-
-  // Constants and primitives
-  //Symbols = Nil;
-  //void *root = NULL;
-  //DEFINE2(env, expr);
-  //*env = make_env(root, &Nil, &Nil);
-  //define_constants(root, env);
-  //define_primitives(root, env);
-
-  // The main loop
   int cnt = 0;
   for (;;) {
     cnt ++;
 
     Element *ele = read_expression(0);
-    if (!ele) return 0;
+    if (!ele) continue;
 
-    printf("%dth list\n", cnt);
+    printf("\nList: ");
     print_list(ele);
+
+    Element *res = eval(env, ele);
+    printf("Eval: ");
+    print_list(res);
+
+    printf("\n");
   }
 }
