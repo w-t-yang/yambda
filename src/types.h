@@ -7,15 +7,10 @@
 
 enum {
   // Types of element
-  // Expression type should be eliminated
-  // because each expression should be parsed into a list starting with a symbol
-  T_EXPRESSION = 0,
+  T_INTEGER = 0,
+  T_STRING,
   T_SYMBOL,
-  T_VALUE,
-
-  // Types of value element
-  TV_INT,
-  TV_STRING,
+  T_LISTHEAD,
 };
 
 struct element{

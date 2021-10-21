@@ -3,6 +3,6 @@
 
 #include "types.h"
 
-Element *read_expression(int with_paren);
+Element *read_list();
 
 #endif

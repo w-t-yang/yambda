@@ -26,13 +26,15 @@ void debug(char *fmt, ...){
 void print_ele(Element *ele) {
   if (!ele) {
     printf("<Null>");
-  } else if ( ele->type == T_EXPRESSION) {
-    printf("<Expression: %s>", ele->str_v);
+  } else if ( ele->type == T_LISTHEAD) {
+    printf("\n(\n");
+    print_list(ele->args);
+    printf(")\n");
   } else if ( ele->type == T_SYMBOL) {
     printf("<Symbol: %s>", ele->str_v);
-  } else if ( ele->type == TV_INT) {
+  } else if ( ele->type == T_INTEGER) {
     printf("<Integer: %d>", ele->int_v);
-  } else if ( ele->type == TV_STRING) {
+  } else if ( ele->type == T_STRING) {
     printf("<String: \"%s\">", ele->str_v);
   } else {
     printf("<Unknown element type>");
