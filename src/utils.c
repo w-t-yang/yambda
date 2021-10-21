@@ -20,16 +20,18 @@ Element *make_integer(int x) {
 
 Element *make_string(char *buffer) {
   // When allocating space for a string,
-  // We need len(buffer) bytes, and 1 byte for '\0'
+  // We need strlen(buffer) bytes, and 1 byte for '\0'
   // We have already allocated 8 bytes when defining `char str_v[1];`
-  Element *ele = alloc(T_STRING, strlen(buffer) + 1 - 8);
+  int needed = strlen(buffer) + 1;
+  Element *ele = alloc(T_STRING, needed > 8 ? needed - 8: 0);
   strcpy(ele->str_v, buffer);
   return ele;
 }
 
 Element *make_symbol(char *buffer) {
   // TODO: validate symbol
-  Element *ele = alloc(T_SYMBOL, strlen(buffer) + 1 - 8);
+  int needed = strlen(buffer) + 1;
+  Element *ele = alloc(T_SYMBOL, needed > 8 ? needed - 8: 0);
   strcpy(ele->str_v, buffer);
   return ele;
 }

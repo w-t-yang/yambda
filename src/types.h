@@ -25,7 +25,7 @@ typedef struct element Element;
 struct env{
   struct env *next;     // 8 bytes
   struct element *list; // 8 bytes
-  char symbol[1];
+  char symbol[1];       // 8 bytes will be allocated
 };
 typedef struct env Env;
 

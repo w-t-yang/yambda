@@ -2,8 +2,8 @@ CFLAGS=-std=gnu99 -g -O2 -Wall
 
 .PHONY: clean test
 
-yambda: clean input.o output.o utils.o
-	gcc -o yambda yambda.c input.o output.o utils.o
+yambda: clean input.o output.o env.o utils.o
+	gcc -o yambda yambda.c input.o output.o env.o utils.o
 
 input.o: src/input.c
 	gcc -c src/input.c
