@@ -70,13 +70,17 @@ Element *prim_eq(Env *env, Element *x) {
 }
 
 Element *prim_car(Element *x) {
-  if (x) {
-    Element *e = make_copy(x);
-    e->next = NULL;
-    return e;
+  Element *e;
+  if (x && x->type == T_LISTHEAD && x->next == NULL) {
+    e = make_copy(x->args);
+  } else  if (x) {
+    e = make_copy(x);
+  } else {
+    error("Expecting at least 1 element for operation CAR.");
+    return NULL;
   }
-  error("Expecting at least 1 element for operation CAR.");
-  return NULL;
+  e->next = NULL;
+  return e;
 }
 
 Element *prim_cdr(Element *x) {

@@ -67,5 +67,6 @@ Element *make_copy(Element *e) {
   ele->int_v = e->int_v;
   if (has_str) { strcpy(ele->str_v, e->str_v); }
   ele->next = e->next;
+  ele->args = e->args;
   return ele;
 }
