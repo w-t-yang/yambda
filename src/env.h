@@ -9,4 +9,7 @@ Element *env_get(Env *env, char *symbol);
 Element *env_set(Env *env, char *symbol, Element *list);
 void env_unset(Env *env, char *symbol);
 
+Element *define(Env *env, char *symbol, Element *list);
+Element *reference(Env *env, char *symbol);
+
 #endif

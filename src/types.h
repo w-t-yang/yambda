@@ -13,6 +13,12 @@ enum {
   T_LISTHEAD,
 };
 
+enum {
+  // Values
+  V_NORMAL_SYMBOL = 0,
+  V_FUNC_SYMBOL,
+};
+
 struct element{
   struct element *next; // 8 bytes
   struct element *args; // 8 bytes

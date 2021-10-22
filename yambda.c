@@ -5,7 +5,9 @@
 #define throw(x) ERROR_FLAG=1;goto EXIT_POINT;
 
 int main(int argc, char **argv) {
-  //Env *env = env_init();
+  Env *env = env_init();
+  init_funcs(env);
+  //print_env(env);
 
   int cnt = 0;
   for (;;) {
@@ -17,9 +19,9 @@ int main(int argc, char **argv) {
     printf("\nList: ");
     print_list(ele);
 
-    //Element *res = eval(env, ele);
-    //printf("Eval: ");
-    //print_list(res);
+    Element *res = eval(env, ele);
+    printf("\nEval: ");
+    print_list(res);
 
     printf("\n");
   }
