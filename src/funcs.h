@@ -18,7 +18,9 @@
 
 #define F_DEF "def"
 #define F_REF "ref"
-#define F_SUM "sum"
+#define F_SUM "+"
+#define F_MUL "*"
+#define F_DIV "/"
 
 #define F_Q "`"
 #define F_A "a?"

@@ -48,13 +48,21 @@ Element *eval(Env *env, Element *head) {
   Element *res = NULL;
 
   if (head->type == T_INTEGER || head->type == T_STRING) {
-    Element *curr = head;
-    while (curr->next) {
-      curr = curr->next;
+    if (head->next) {
+      return eval(env, head->next);
+    } else {
+      return head;
     }
-    return curr;
+    /* Element *curr = head; */
+    /* while (curr->next) { */
+    /*   curr = curr->next; */
+    /* } */
+    /* return curr; */
   } else if (head->type == T_LISTHEAD) {
-    return eval(env, head->args);
+    Element *next = head->next;
+    Element *curr = eval(env, head->args);
+    curr->next = next;
+    return eval(env, curr);
   } else if (head->type == T_SYMBOL) {
     Element *list = head->next;
     Element *args = head->args;
@@ -78,7 +86,11 @@ Element *eval(Env *env, Element *head) {
     }
     // Math
     else if (streq(head->str_v, F_SUM)) {
-      res = math_plus(env, list);
+      res = math_sum(env, list);
+    } else if (streq(head->str_v, F_MUL)) {
+      res = math_mul(env, list);
+    } else if (streq(head->str_v, F_DIV)) {
+      res = math_div(env, list);
     }
     // Core
     else if (streq(head->str_v, F_DEF)) {

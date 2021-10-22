@@ -1,11 +1,13 @@
-sum 1 2 3
-sum 1 2 -3 4
++ 1 2 3
++ 1 2 -3 4
 
 def a 1
 def b 2
 def c 3
 def d c
-sum a b c d
++ a b c d
 
-def + sum
-+ 1 2 3
+def sum +
+sum 1 2 3
+
++ 1 (sum 2 3 (+ a)) 4
