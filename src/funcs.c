@@ -44,6 +44,28 @@ Element *apply(Env *env, Element *lambda, Element *args) {
   return res;
 }
 
+Element *pre_eval(Env *env, Element *head) {
+  Element *curr = head;
+  Element *prev = NULL;
+  while (curr) {
+    if (curr->type == T_LISTHEAD) {
+      Element *l = eval(env, curr->args);
+      if (prev) {
+        prev->next = l;
+        l->next = curr->next;
+        curr = l;
+      } else {
+        l->next = curr->next;
+        head = l;
+        curr = l;
+      }
+    }
+    prev = curr;
+    curr = curr->next;
+  }
+  return head;
+}
+
 Element *eval(Env *env, Element *head) {
   Element *res = NULL;
   if (!head) {
@@ -72,7 +94,7 @@ Element *eval(Env *env, Element *head) {
     if (streq(head->str_v, F_Q)) {
       res = prim_quote(list);
     } else if (streq(head->str_v, F_A)) {
-      res = prim_atom(list);
+      res = prim_atom(pre_eval(env, list));
     } else if (streq(head->str_v, F_EQ)) {
       res = prim_eq(list);
     } else if (streq(head->str_v, F_CAR)) {

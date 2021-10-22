@@ -15,11 +15,24 @@ Element *prim_atom(Element *x) {
   if (!x) {
     // NULL is atom
     return make_integer(1);
-  } else if (x->type > T_INTEGER && !(x->next)) {
+  } else if (x->next) {
+    error("More than 1 element provided for operation ATOM?");
+    return NULL;
+  } else if (x->type == T_INTEGER) {
     return make_integer(1);
-  } else if (x->type > T_STRING && !(x->next)) {
+  } else if (x->type == T_STRING) {
     return make_integer(1);
+  } else if (x->type == T_LISTHEAD) {
+    if (x->args == NULL
+        || (x->args->type == V_SYMBOL_NULL && x->args->next == NULL)) {
+      return make_integer(1);
+    } else {
+      return make_integer(0);
+    }
   } else if (x->type == T_SYMBOL) {
+    if (x->int_v == V_SYMBOL_NULL) {
+      return make_integer(1);
+    }
     error("Haven't decided whether a symbol is atom or not.");
     return make_integer(0);
   } else {

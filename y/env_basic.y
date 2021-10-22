@@ -5,8 +5,8 @@ ref b
 
 def x 1 2 3
 
-def + sum
-ref +
+def sum +
+ref sum
 
 def c a
 ref c
