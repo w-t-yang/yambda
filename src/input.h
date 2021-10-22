@@ -3,6 +3,6 @@
 
 #include "types.h"
 
-Element *read_list();
+Element *read_block();
 
 #endif

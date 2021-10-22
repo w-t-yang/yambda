@@ -7,6 +7,8 @@
 
 #define BUFFER_SIZE 128
 
+Element *read_list();
+
 int peek(void) {
   int c = getchar();
   ungetc(c, stdin);
@@ -250,7 +252,6 @@ Element *read_list() {
       } else if (c == '\n' || c == '\r') {
         // TODO: support indentation
         getchar();
-        if (!head) continue;
         return head;
       } else if (c == ' ') {
         getchar();
@@ -271,4 +272,15 @@ Element *read_list() {
       tail = ele;
     }
   }
+}
+
+Element *read_block() {
+  Element *head = NULL;
+  int start_with_parenthesis = (peek() == '(');
+  head = read_list();
+  if (start_with_parenthesis) {
+    Element *rest = read_block();
+    head->next = rest;
+  }
+  return head;
 }

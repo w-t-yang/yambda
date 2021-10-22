@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
   for (;;) {
     cnt ++;
 
-    Element *ele = read_list();
+    Element *ele = read_block();
     if (!ele) continue;
 
     printf("\nList: ");
