@@ -47,20 +47,19 @@ Element *apply(Env *env, Element *lambda, Element *args) {
 Element *eval(Env *env, Element *head) {
   Element *res = NULL;
 
-  if (head->type == T_INTEGER || head->type == T_STRING) {
+  if (head->type == T_INTEGER || head->type == T_STRING
+      || (head->type == T_LISTHEAD && head->int_v == V_LIST_EVALED)) {
     if (head->next) {
       return eval(env, head->next);
     } else {
       return head;
     }
-    /* Element *curr = head; */
-    /* while (curr->next) { */
-    /*   curr = curr->next; */
-    /* } */
-    /* return curr; */
   } else if (head->type == T_LISTHEAD) {
     Element *next = head->next;
     Element *curr = eval(env, head->args);
+    if (curr->type == T_LISTHEAD) {
+      curr->int_v = V_LIST_EVALED;
+    }
     curr->next = next;
     return eval(env, curr);
   } else if (head->type == T_SYMBOL) {

@@ -5,7 +5,9 @@
 #include "../utils.h"
 
 Element *prim_quote(Element *x) {
-  return x;
+  Element *h = make_list_head();
+  h->args = x;
+  return h;
 }
 
 Element *prim_atom(Element *x) {

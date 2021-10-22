@@ -48,6 +48,7 @@ Element *make_func_symbol(char *buffer) {
 
 Element *make_list_head() {
   Element *ele = alloc(T_LISTHEAD, 0);
+  ele->int_v = V_LIST_UNEVALED;
   return ele;
 }
 

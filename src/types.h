@@ -17,6 +17,9 @@ enum {
   // Values
   V_NORMAL_SYMBOL = 0,
   V_FUNC_SYMBOL,
+
+  V_LIST_UNEVALED,
+  V_LIST_EVALED,
 };
 
 struct element{
