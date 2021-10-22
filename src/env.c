@@ -87,7 +87,7 @@ Element *reference(Env *env, char *symbol) {
   if (e->type == T_INTEGER || e->type == T_STRING || e->type == T_LISTHEAD) {
     return e;
   } else if (e->type == T_SYMBOL) {
-    if (e->int_v == V_FUNC_SYMBOL) {
+    if (e->int_v == V_SYMBOL_FUNC || e->int_v == V_SYMBOL_NULL) {
       return e;
     } else {
       return reference(env, e->str_v);

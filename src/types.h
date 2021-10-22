@@ -15,8 +15,9 @@ enum {
 
 enum {
   // Values
-  V_NORMAL_SYMBOL = 0,
-  V_FUNC_SYMBOL,
+  V_SYMBOL_NORMAL = 0,
+  V_SYMBOL_FUNC,
+  V_SYMBOL_NULL,
 
   V_LIST_UNEVALED,
   V_LIST_EVALED,

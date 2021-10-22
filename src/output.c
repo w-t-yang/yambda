@@ -28,7 +28,11 @@ void print_ele(Element *ele) {
     printf("<Null>");
   } else if ( ele->type == T_LISTHEAD) {
     printf("(");
-    print_list(ele->args);
+    if (ele->args) {
+      print_list(ele->args);
+    } else {
+      printf(" ");
+    }
     printf("\b) ");
   } else if (ele->type == T_SYMBOL) {
     //printf("<Symbol: %s>", ele->str_v);

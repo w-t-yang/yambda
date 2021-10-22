@@ -46,8 +46,9 @@ Element *apply(Env *env, Element *lambda, Element *args) {
 
 Element *eval(Env *env, Element *head) {
   Element *res = NULL;
-
-  if (head->type == T_INTEGER || head->type == T_STRING
+  if (!head) {
+    return make_null_symbol();
+  } else if (head->type == T_INTEGER || head->type == T_STRING
       || (head->type == T_LISTHEAD && head->int_v == V_LIST_EVALED)) {
     if (head->next) {
       return eval(env, head->next);

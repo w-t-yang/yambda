@@ -32,7 +32,7 @@ Element *make_symbol(char *buffer) {
   // TODO: validate symbol
   int needed = strlen(buffer) + 1;
   Element *ele = alloc(T_SYMBOL, needed > 8 ? needed - 8: 0);
-  ele->int_v = V_NORMAL_SYMBOL;
+  ele->int_v = V_SYMBOL_NORMAL;
   strcpy(ele->str_v, buffer);
   return ele;
 }
@@ -41,8 +41,15 @@ Element *make_func_symbol(char *buffer) {
   // TODO: validate symbol
   int needed = strlen(buffer) + 1;
   Element *ele = alloc(T_SYMBOL, needed > 8 ? needed - 8: 0);
-  ele->int_v = V_FUNC_SYMBOL;
+  ele->int_v = V_SYMBOL_FUNC;
   strcpy(ele->str_v, buffer);
+  return ele;
+}
+
+Element *make_null_symbol() {
+  Element *ele = alloc(T_LISTHEAD, 0);
+  ele->int_v = V_SYMBOL_NULL;
+  strcpy(ele->str_v, "");
   return ele;
 }
 
