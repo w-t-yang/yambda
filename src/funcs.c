@@ -96,7 +96,7 @@ Element *eval(Env *env, Element *head) {
     } else if (streq(head->str_v, F_A)) {
       res = prim_atom(pre_eval(env, list));
     } else if (streq(head->str_v, F_EQ)) {
-      res = prim_eq(list);
+      res = prim_eq(env, list);
     } else if (streq(head->str_v, F_CAR)) {
       res = prim_car(list);
     } else if (streq(head->str_v, F_CDR)) {

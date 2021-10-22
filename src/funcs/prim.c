@@ -40,26 +40,27 @@ Element *prim_atom(Element *x) {
   }
 }
 
-Element *prim_eq(Element *x) {
+Element *prim_eq(Env *env, Element *x) {
   // TODO: handle more than 3 elements in list x
   if (x && x->next && x->next->next) {
     error("More than 2 elements are provided for operation EQ, extra elements are ignored.");
   }
 
   if (x && x->next) {
-    if (x->type != x->next->type) {
+    Element *a = x->type == T_SYMBOL ? reference(env, x->str_v) : x;
+    Element *b = x->next->type == T_SYMBOL ? reference(env, x->next->str_v) : x->next;
+    if (a->type != b->type) {
       return make_integer(0);
-    } else if (x->type == T_INTEGER && x->int_v == x->next->int_v) {
+    } else if (a->type == T_INTEGER && a->int_v == b->int_v) {
       return make_integer(1);
-    } else if (x->type == T_STRING && streq(x->str_v, x->next->str_v)) {
+    } else if (a->type == T_STRING && streq(a->str_v, b->str_v)) {
       return make_integer(1);
-    } else if (x->type == T_SYMBOL && streq(x->str_v, x->next->str_v)) {
+    } else if (a->type == T_SYMBOL && streq(a->str_v, b->str_v)) {
       return make_integer(1);
     } else if (x->type == T_LISTHEAD){
       error("Comparison of lists is not implemented.");
       return make_integer(0);
     } else {
-      error("Unknown element type.");
       return make_integer(0);
     }
   }
