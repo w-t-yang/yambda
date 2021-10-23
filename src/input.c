@@ -1,5 +1,4 @@
 #include <ctype.h>
-#include <stdio.h>
 
 #include "input.h"
 #include "output.h"
@@ -23,72 +22,6 @@ int end_of_element(char c) {
   }
 }
 
-// To be removed
-/* Element *read_element_old(char s) { */
-/*   char *buffer = malloc(BUFFER_SIZE); */
-/*   buffer[0] = s; */
-/*   buffer[1] = '\0'; */
-/*   int expecting_digit = (s == '-' || isdigit(s)); */
-
-/*   for (;;) { */
-/*     char c = getchar(); */
-/*     if (end_of_element(c)) { */
-/*       // Put '\n' '\r' back to stdin */
-/*       ungetc(c, stdin); */
-
-/*       if (expecting_digit) { */
-/*         // Special case when buffer starts with "-" */
-/*         if (strlen(buffer) == 1 && buffer[0] == '-') { */
-/*           return make_symbol(buffer); */
-/*         } else { */
-/*           return make_integer(atoi(buffer)); */
-/*         } */
-/*       } else { */
-/*         return make_symbol(buffer); */
-/*       } */
-/*     } else { */
-/*       if (expecting_digit && !isdigit(c)) { */
-/*         error("Expecting digit after \"%s\"", buffer); */
-/*       } */
-/*       // TODO: Allocate more space when buffer is used up */
-/*       strncat(buffer, &c, 1); */
-/*     } */
-/*   } */
-/* } */
-
-// To be removed
-/* Element *read_expression_string() { */
-/*   char *buffer = malloc(BUFFER_SIZE); */
-/*   buffer[0] = '\0'; */
-/*   char s = '('; */
-/*   char e = ')'; */
-/*   int s_count = 0; */
-
-/*   for (;;) { */
-/*     char c = getchar(); */
-/*     if (c == s) { */
-/*       s_count += 1; */
-/*       strncat(buffer, &c, 1); */
-/*     } else if (c == e) { */
-/*       if (s_count > 0) { */
-/*         s_count -= 1; */
-/*         strncat(buffer, &c, 1); */
-/*       } else { */
-/*         char next = peek(); */
-/*         if (end_of_element(next)){ */
-/*           return make_expression(buffer); */
-/*         } else { */
-/*           error("Invalid expression format. End of expression should be followed by ' '."); */
-/*         } */
-/*       } */
-/*     } else if (c == EOF) { */
-/*       error("Invalid expression format. End of file reached."); */
-/*     } else { */
-/*       strncat(buffer, &c, 1); */
-/*     } */
-/*   } */
-/* } */
-
 // TODO: For all `strncat(buffer...);`, allocate more space when buffer is used up
 
 Element *read_integer() {
@@ -104,25 +37,21 @@ Element *read_integer() {
   for (;;) {
     char c = getchar();
     if (end_of_element(c)) {
-      // Put '\n' '\r' back to stdin
+      // Put '\n', '\r', etc. back to stdin
       ungetc(c, stdin);
 
       if (strlen(buffer) == 0) {
-        error("Invalid integer.");
-        return NULL;
+        return make_error("Invalid integer.");
       } else {
         int i = atoi(buffer);
-        if (isnegative) {
-          i = -i;
-        }
+        if (isnegative) { i = -i; }
         return make_integer(i);
       }
     } else {
       if (isdigit(c)) {
         strncat(buffer, &c, 1);
       } else {
-        error("Invalid integer \"%s%c...\"", buffer, c);
-        return NULL;
+        return make_error("Invalid integer \"%s%c...\"", buffer, c);
       }
     }
   }
@@ -130,45 +59,44 @@ Element *read_integer() {
 
 Element *read_string() {
   char quote = getchar();
-
   char *buffer = malloc(BUFFER_SIZE);
   buffer[0] = '\0';
+
   for (;;) {
     char c = getchar();
     if (c == EOF) {
-      error("Invalid string. End of file reached.");
-      return NULL;
+      return make_error("Invalid string. End of file reached.");
     } else if (c == quote) {
-      char next = peek();
-      if (end_of_element(next)){
+      if (end_of_element(peek())){
         return make_string(buffer);
       } else {
-        error("Invalid string. End of string should be followed by whitespace.");
+        return make_error("End of string should be followed by whitespace.");
       }
     } else if ( c == '\\') {
       strncat(buffer, &c, 1);
-
       c = getchar();
       if (c == EOF) {
-        error("Invalid string. End of file reached.");
-        return NULL;
+        return make_error("Invalid string. End of file reached.");
       }
       strncat(buffer, &c, 1);
     } else {
-
       strncat(buffer, &c, 1);
     }
   }
 }
 
 Element *read_symbol() {
+  // Notice:
+  // T_FUNC and T_LAMBDA will be read as T_SYMBOL.
+  // This is not a problem because,
+  // when referencing symbol of T_FUNC/T_LAMBDA,
+  // we will eventually get the T_FUNC/T_LAMBDA element from the Environment.
   char *buffer = malloc(BUFFER_SIZE);
   buffer[0] = '\0';
 
   for (;;) {
     char c = getchar();
     if (end_of_element(c)) {
-      // Put '\n' '\r' back to stdin
       ungetc(c, stdin);
       return make_symbol(buffer);
     } else {
@@ -180,7 +108,7 @@ Element *read_symbol() {
 
 Element *read_element() {
   char s = peek();
-  // Types of elements
+  // Types of elements that can be read
   // 1. Number, s is digit or s == '-', TODO: Support numbers other than integer
   // 2. String, s == '"' or s == '\''
   // 3. List, s == '()'
@@ -188,7 +116,7 @@ Element *read_element() {
 
   if (end_of_element(s)) {
     getchar();
-    return NULL;
+    return none;
   } else if (isdigit(s) || s == '-') {
     return read_integer();
   } else if (s == '"' || s == '\'') {
@@ -203,7 +131,7 @@ Element *read_element() {
 Element *read_list() {
   // Types of list
   // 1. whole line
-  // 2. lines started with proper indentation, not supported yet
+  // 2. lines started with proper indentation, not supported yet [TODO]
   // 3. strings surrounded by ()
   Element *head = NULL;
   Element *tail = NULL;
@@ -219,18 +147,16 @@ Element *read_list() {
     Element *ele = NULL;
 
     if (c == '\t') {
-      error("Do NOT use \\t in yambda script");
-      return NULL;
+      return make_error("DO NOT use \\t in yambda script.");
     }
 
     if (start_with_parenthesis) {
       if (c == EOF) {
-        error("Unclosed parenthesis.");
-        return NULL;
+        return make_error("Unclosed parenthesis.");
       } else if (c == ')') {
         getchar();
         Element *lh = make_list_head();
-        lh->args = head;
+        lh->sub = head;
         return lh;
       } else if (c == '\n' || c == '\r') {
         // TODO: support indentation
@@ -247,8 +173,7 @@ Element *read_list() {
         return head;
       } else if (c == ')') {
         getchar();
-        error("Invalid parenthesis ')'");
-        return NULL;
+        return make_error("Invalid parenthesis ')'");
       } else if (c == '\n' || c == '\r') {
         // TODO: support indentation
         getchar();
@@ -260,8 +185,6 @@ Element *read_list() {
         ele = read_element();
       }
     }
-
-    //debug("Read element of type: %d", ele->type);
 
     if (!ele) {
       // Do nothing

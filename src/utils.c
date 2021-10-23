@@ -1,15 +1,46 @@
 #include "utils.h"
 
-#define ELEMENT_MIN_SIZE 32
-
 Element *alloc(int type, size_t size) {
-  // This might allocate a little bit more memory than needed
-  // Because the last 8 bytes of Element struct were only used by str_v[1]
-  // Possible to save 6-7 bytes by some optimization
   size += ELEMENT_MIN_SIZE;
   Element *ele = malloc(size);
   ele->type = type;
+  ele->int_v = 0;
+  ele->str_v[0] = '\0';
+  ele->next = NULL;
+  ele->sub = NULL;
   return ele;
+}
+
+static Element *_none_ = NULL;
+Element *make_none() {
+  if (!_none_) {
+    Element *ele = alloc(T_NONE, 0);
+    _none_ = ele;
+  }
+  return _none_;
+}
+
+Element *_make_error(char *buffer) {
+  Element *ele = alloc(T_ERROR, EXTRA_SPACE);
+  strcpy(ele->str_v, buffer);
+  return ele;
+}
+
+Element *make_error(char *fmt, ...) {
+  int len;
+  char *msg;
+  va_list args;
+
+  va_start(args, fmt);
+  len = vsnprintf(0, 0, fmt, args);
+  va_end(args);
+
+  msg = malloc(len + 1);
+  va_start(args, fmt);
+  vsnprintf(msg, len + 1, fmt, args);
+  va_end(args);
+
+  return _make_error(msg);
 }
 
 Element *make_integer(int x) {
@@ -19,43 +50,33 @@ Element *make_integer(int x) {
 }
 
 Element *make_string(char *buffer) {
-  // When allocating space for a string,
-  // We need strlen(buffer) bytes, and 1 byte for '\0'
-  // We have already allocated 8 bytes when defining `char str_v[1];`
-  int needed = strlen(buffer) + 1;
-  Element *ele = alloc(T_STRING, needed > 8 ? needed - 8: 0);
+  Element *ele = alloc(T_STRING, EXTRA_SPACE);
   strcpy(ele->str_v, buffer);
   return ele;
 }
 
 Element *make_symbol(char *buffer) {
   // TODO: validate symbol
-  int needed = strlen(buffer) + 1;
-  Element *ele = alloc(T_SYMBOL, needed > 8 ? needed - 8: 0);
-  ele->int_v = V_SYMBOL_NORMAL;
+  Element *ele = alloc(T_SYMBOL, EXTRA_SPACE);
   strcpy(ele->str_v, buffer);
-  return ele;
-}
-
-Element *make_func_symbol(char *buffer) {
-  // TODO: validate symbol
-  int needed = strlen(buffer) + 1;
-  Element *ele = alloc(T_SYMBOL, needed > 8 ? needed - 8: 0);
-  ele->int_v = V_SYMBOL_FUNC;
-  strcpy(ele->str_v, buffer);
-  return ele;
-}
-
-Element *make_null_symbol() {
-  Element *ele = alloc(T_LISTHEAD, 0);
-  ele->int_v = V_SYMBOL_NULL;
-  strcpy(ele->str_v, "");
   return ele;
 }
 
 Element *make_list_head() {
   Element *ele = alloc(T_LISTHEAD, 0);
   ele->int_v = V_LIST_UNEVALED;
+  return ele;
+}
+
+Element *make_func(char *buffer) {
+  Element *ele = alloc(T_FUNC, EXTRA_SPACE);
+  strcpy(ele->str_v, buffer);
+  return ele;
+}
+
+Element *make_lambda(char *buffer) {
+  Element *ele = alloc(T_LAMBDA, EXTRA_SPACE);
+  strcpy(ele->str_v, buffer);
   return ele;
 }
 
@@ -67,6 +88,11 @@ Element *make_copy(Element *e) {
   ele->int_v = e->int_v;
   if (has_str) { strcpy(ele->str_v, e->str_v); }
   ele->next = e->next;
-  ele->args = e->args;
+  ele->sub = e->sub;
   return ele;
+}
+
+void free_list(Element *e) {
+  // TODO: properly free a list
+  free(e);
 }

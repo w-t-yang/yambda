@@ -1,9 +1,7 @@
-#include <stdarg.h>
-#include <stdio.h>
-
 #include "output.h"
 
-void error(char *fmt, ...) {
+void throw(char *fmt, ...) {
+  fprintf(stdout, "\nException: ");
   va_list ap;
   va_start(ap, fmt);
   vfprintf(stderr, fmt, ap);
@@ -23,28 +21,51 @@ void debug(char *fmt, ...){
   va_end(ap);
 }
 
+void warn(char *fmt, ...){
+  fprintf(stdout, "\nWarning: ");
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stdout, fmt, ap);
+  fprintf(stdout, "\n");
+  va_end(ap);
+}
+
+void p(char *fmt, ...){
+  printf("\n");
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stdout, fmt, ap);
+  fprintf(stdout, "\n");
+  va_end(ap);
+}
+
 void print_ele(Element *ele) {
   if (!ele) {
-    printf("<Null>");
+    throw("Trying to print NULL pointer.");
+  } else if (ele->type == T_NONE) {
+    printf("None ");
+  } else if (ele->type == T_ERROR) {
+    throw(ele->str_v);
+  } else if (ele->type == T_INTEGER) {
+    printf("%d ", ele->int_v);
+  } else if (ele->type == T_STRING) {
+    printf("\"%s\" ", ele->str_v);
+  } else if (ele->type == T_SYMBOL) {
+    printf("%s ", ele->str_v);
   } else if ( ele->type == T_LISTHEAD) {
     printf("(");
-    if (ele->args) {
-      print_list(ele->args);
+    if (ele->sub) {
+      print_list(ele->sub);
     } else {
       printf(" ");
     }
     printf("\b) ");
-  } else if (ele->type == T_SYMBOL) {
-    //printf("<Symbol: %s>", ele->str_v);
+  } else if (ele->type == T_FUNC) {
     printf("%s ", ele->str_v);
-  } else if (ele->type == T_INTEGER) {
-    //printf("<Integer: %d>", ele->int_v);
-    printf("%d ", ele->int_v);
-  } else if (ele->type == T_STRING) {
-    //printf("<String: \"%s\">", ele->str_v);
-    printf("\"%s\" ", ele->str_v);
+  } else if (ele->type == T_LAMBDA) {
+    printf("%s ", ele->str_v);
   } else {
-    printf("<Unknown element type>");
+    throw("Unknown element type %d.", ele->type);
   }
 }
 
@@ -56,20 +77,22 @@ void print_list(Element *curr) {
 }
 
 void print_env(Env *env) {
-  printf("\nPrinting ENV: \n");
+  p("Printing ENV:");
 
   Env *curr = env;
   while (curr) {
-    printf("%s -> ", curr->symbol);
-    print_list(curr->list);
+    printf("%s ", curr->symbol);
     curr = curr->next;
   }
-  printf("End of ENV\n");
+
+  p("End of ENV");
 }
 
 void print_env_node(Env *env) {
-  printf("\nPrinting ENV node: \n");
+  printf("Printing ENV node:");
+
   printf("Symbol: %s\n", env->symbol);
   print_list(env->list);
-  printf("End of ENV node\n");
+
+  printf("End of ENV node");
 }
