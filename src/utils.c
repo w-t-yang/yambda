@@ -68,8 +68,10 @@ Element *make_list_head() {
   return ele;
 }
 
-Element *make_func(char *buffer) {
-  Element *ele = alloc(T_FUNC, EXTRA_SPACE);
+Element *make_prim(int index) {
+  char *buffer = KEYWORDS[index];
+  Element *ele = alloc(T_PRIM, EXTRA_SPACE);
+  ele->int_v = index;
   strcpy(ele->str_v, buffer);
   return ele;
 }
@@ -81,6 +83,7 @@ Element *make_lambda(char *buffer) {
 }
 
 Element *make_copy(Element *e) {
+  // TODO: consider deep copy
   int has_str = (strlen(e->str_v) > 0);
   int bytes_for_str = has_str ? strlen(e->str_v) + 1 - 8 : 0;
 

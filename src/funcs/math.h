@@ -3,8 +3,8 @@
 
 #include "../types.h"
 
-Element *math_sum(Env *env, Element *x);
-Element *math_mul(Env *env, Element *x);
-Element *math_div(Env *env, Element *x);
+Element *math_sum(Element *x);
+Element *math_mul(Element *x);
+Element *math_div(Element *x);
 
 #endif

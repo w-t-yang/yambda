@@ -9,5 +9,6 @@
 #include "src/input.h"
 #include "src/output.h"
 #include "src/types.h"
+#include "src/utils.h"
 
 #endif

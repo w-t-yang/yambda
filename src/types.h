@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "keywords.h"
+
 enum {
   // Types of element
   T_NONE = 0,
@@ -13,7 +16,7 @@ enum {
   T_STRING,
   T_SYMBOL,
   T_LISTHEAD,
-  T_FUNC,
+  T_PRIM,
   T_LAMBDA,
 };
 
@@ -21,10 +24,6 @@ enum {
   // Values
   V_LIST_UNEVALED = 0,
   V_LIST_EVALED,
-
-  /* V_SYMBOL_NORMAL, */
-  /* V_SYMBOL_FUNC, */
-  /* V_SYMBOL_NULL, */
 };
 
 struct element{

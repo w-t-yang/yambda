@@ -4,6 +4,7 @@
 enum {
   K_EMPTY = 0,
 
+  K_LET,
   K_DEF,
   K_REF,
 
@@ -26,6 +27,7 @@ enum {
 static char KEYWORDS[KEYWORDS_COUNT][KEYWORD_MAX_LENGTH] = {
   "",
 
+  "let",
   "def",
   "ref",
 

@@ -2,7 +2,7 @@
 #include "output.h"
 #include "utils.h"
 
-boolean is_keyword(char *k) {
+boolean _is_keyword(char *k) {
   for (int i = 0; i < KEYWORDS_COUNT; i++) {
     if (streq(k, KEYWORDS[i])) {
       return true;
@@ -11,8 +11,8 @@ boolean is_keyword(char *k) {
   return false;
 }
 
-void validate_symbol(char *k) {
-  if (is_keyword(k)) {
+void _validate_symbol(char *k) {
+  if (_is_keyword(k)) {
     throw("Cannot use \"%s\" as environment symbol.", k);
   }
 }
@@ -21,9 +21,7 @@ void validate_symbol(char *k) {
 // 1. In order to improve performance, re-implment env by hashmap or trie
 // 2. Use nested env, instead of global env
 
-Env *make_env_node(char *buffer) {
-  validate_symbol(buffer);
-
+Env *_make_env_node(char *buffer) {
   Env *env = malloc(24 + EXTRA_SPACE);
   env->list = NULL;
   env->next = NULL;
@@ -31,11 +29,7 @@ Env *make_env_node(char *buffer) {
   return env;
 }
 
-Env *env_init() {
-  return make_env_node("");
-}
-
-Element *env_get(Env *env, char *symbol) {
+Element *_env_get(Env *env, char *symbol) {
   Env *curr = env;
   while (curr) {
     if (streq(curr->symbol, symbol)) {
@@ -46,7 +40,7 @@ Element *env_get(Env *env, char *symbol) {
   return make_error("Symbol \"%s\" not found.", symbol);
 }
 
-Element *env_unset(Env *env, char *symbol) {
+Element *_env_unset(Env *env, char *symbol) {
   Env *curr = env;
   while (curr) {
     if (streq(curr->symbol, symbol)) {
@@ -59,7 +53,9 @@ Element *env_unset(Env *env, char *symbol) {
   return make_error("Symbol \"%s\" not found.", symbol);
 }
 
-Element *env_set(Env *env, char *symbol, Element *list) {
+Element *_env_set(Env *env, char *symbol, Element *list) {
+
+
   if (strlen(symbol) == 0) {
     return make_error("Invalid symbol name \"%s\".", symbol);
   }
@@ -78,7 +74,7 @@ Element *env_set(Env *env, char *symbol, Element *list) {
     if (curr->next) {
       curr = curr->next;
     } else {
-      Env *e = make_env_node(symbol);
+      Env *e = _make_env_node(symbol);
       e->list = list;
       curr->next = e;
       return e->list;
@@ -87,16 +83,55 @@ Element *env_set(Env *env, char *symbol, Element *list) {
   return make_error("This error is not expected.");
 }
 
-Element *define(Env *env, char *symbol, Element *x) {
-  env_set(env, symbol, x);
-  return x;
+Env *env_init() {
+  Env *env = malloc(24 + 0);
+  env->list = NULL;
+  env->next = NULL;
+  strcpy(env->symbol, "");
+
+  for (int i = 0; i < KEYWORDS_COUNT; i++) {
+    _env_set(env, KEYWORDS[i], make_prim(i));
+  }
+  return env;
 }
 
-Element *reference(Env *env, char *symbol) {
-  Element *e = env_get(env, symbol);
-  if (e->type == T_SYMBOL) {
-    return reference(env, e->str_v);
+Element *let(Env *env, Element *x) {
+  if (x == NULL
+      || x->next == NULL
+      || x->type != T_SYMBOL) {
+    return make_error("Invalid params for operation LET");
+  }
+  _validate_symbol(x->str_v);
+
+  // TODO: check whether x can be changed
+  _env_set(env, x->str_v, x->next);
+  return x->next;
+}
+
+Element *define(Env *env, Element *x) {
+  if (x == NULL
+      || x->next == NULL
+      || x->type != T_SYMBOL) {
+    return make_error("Invalid params for operation DEF");
+  }
+
+  _validate_symbol(x->str_v);
+
+  // TODO: check whether x can be changed
+  return make_error("`DEF` not implemented.");
+  //return x->next;
+}
+
+Element *reference(Env *env, Element *x) {
+  if (x == NULL || x->type != T_SYMBOL) {
+    return make_error("Invalid params for operation REF");
+  }
+
+  // TODO: check whether e can be changed
+  Element *e = _env_get(env, x->str_v);
+  if (e && e->type == T_SYMBOL) {
+    return reference(env, e);
   } else {
-    return e;
+    return make_copy(e);
   }
 }

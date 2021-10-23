@@ -1,14 +1,24 @@
-def a 1
-def b 2
+ref let
+
+let a 1
 ref a
+a
+
+ref let
+
+let b 2
 ref b
 
-def x 1 2 3
+let x 1 2 3
 
-def sum +
-ref sum
+let "a" 1
 
-def c a
+let c a
 ref c
+c
+a b c
 
-c a b
+def a 1
+
+d
+ref d

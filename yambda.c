@@ -6,8 +6,6 @@
 
 int main(int argc, char **argv) {
   Env *env = env_init();
-  init_funcs(env);
-  //print_env(env);
 
   int cnt = 0;
   for (;;) {
@@ -16,13 +14,15 @@ int main(int argc, char **argv) {
     Element *ele = read_block();
     if (!ele) continue;
 
-    printf("\nList: ");
-    print_list(ele);
+    printf("List: ");
+    plst(ele);
 
     Element *res = eval(env, ele);
     printf("\nEval: ");
-    print_list(res);
+    plst(res);
 
-    printf("\n");
+    printf("\n\n");
+
+    if (peek() == EOF) { exit(1); }
   }
 }

@@ -6,110 +6,126 @@
 
 Element *prim_quote(Element *x) {
   Element *h = make_list_head();
-  h->args = x;
+  h->sub = x;
   return h;
 }
 
 Element *prim_atom(Element *x) {
-  // Is single symbol considered as atom?
-  if (!x) {
-    // NULL is atom
-    return make_integer(1);
-  } else if (x->next) {
-    error("More than 1 element provided for operation ATOM?");
-    return NULL;
-  } else if (x->type == T_INTEGER) {
-    return make_integer(1);
-  } else if (x->type == T_STRING) {
+  if (!x) { return make_error("Cannot call ATOM on NULL list."); }
+  if (x->type == T_ERROR
+      || x->type == T_PRIM
+      || x->type == T_LAMBDA
+      || x->type == T_SYMBOL) {
+    return make_error("Unsupported type %d for prim function ATOM.", x->type);
+  }
+
+  if (x->next) {
+    return make_error("Expect 1 element for operation ATOM.");
+  } else if (x->type == T_NONE
+             || x->type == T_INTEGER
+             || x->type == T_STRING) {
     return make_integer(1);
   } else if (x->type == T_LISTHEAD) {
-    if (x->args == NULL
-        || (x->args->type == V_SYMBOL_NULL && x->args->next == NULL)) {
+    if (x->sub == NULL || (x->sub->type == T_NONE)) {
       return make_integer(1);
     } else {
-      return make_integer(0);
+      return none;
     }
-  } else if (x->type == T_SYMBOL) {
-    if (x->int_v == V_SYMBOL_NULL) {
-      return make_integer(1);
-    }
-    error("Haven't decided whether a symbol is atom or not.");
-    return make_integer(0);
   } else {
-    return make_integer(0);
+    return none;
   }
 }
 
-Element *prim_eq(Env *env, Element *x) {
-  // TODO: handle more than 3 elements in list x
+Element *prim_eq(Element *x) {
+  if (!x) { return make_error("Cannot call EQ on NULL list."); }
+  if (x->type == T_ERROR
+      || x->type == T_PRIM
+      || x->type == T_LAMBDA
+      || x->type == T_SYMBOL) {
+    return make_error("Unsupported type %d for prim function EQ.", x->type);
+  }
+
   if (x && x->next && x->next->next) {
-    error("More than 2 elements are provided for operation EQ, extra elements are ignored.");
+    return make_error("Expect 2 elements for operation EQ.");
   }
 
   if (x && x->next) {
-    Element *a = x->type == T_SYMBOL ? reference(env, x->str_v) : x;
-    Element *b = x->next->type == T_SYMBOL ? reference(env, x->next->str_v) : x->next;
+    Element *a = x;
+    Element *b = x->next;
     if (a->type != b->type) {
-      return make_integer(0);
+      return none;
+    } else if (a->type == T_NONE) {
+      return make_integer(1);
     } else if (a->type == T_INTEGER && a->int_v == b->int_v) {
       return make_integer(1);
     } else if (a->type == T_STRING && streq(a->str_v, b->str_v)) {
       return make_integer(1);
-    } else if (a->type == T_SYMBOL && streq(a->str_v, b->str_v)) {
-      return make_integer(1);
     } else if (x->type == T_LISTHEAD){
-      error("Comparison of lists is not implemented.");
-      return make_integer(0);
+      return make_error("Comparison of lists is not implemented.");
     } else {
-      return make_integer(0);
+      return none;
     }
   }
 
-  error("Expect two elements for operation EQ.");
-  return 0;
+  return make_error("Expect two elements for operation EQ.");
 }
 
 Element *prim_car(Element *x) {
-  Element *e;
-  if (x && x->type == T_LISTHEAD && x->next == NULL) {
-    e = make_copy(x->args);
-  } else  if (x) {
-    e = make_copy(x);
-  } else {
-    error("Expecting at least 1 element for operation CAR.");
-    return NULL;
+  if (!x) { return make_error("Cannot call CAR on NULL list."); }
+  if (x->type == T_NONE
+      || x->type == T_ERROR
+      || x->type == T_PRIM
+      || x->type == T_LAMBDA
+      || x->type == T_SYMBOL) {
+    return make_error("Unsupported type %d for prim function CAR.", x->type);
+  } else if (x->type == T_LISTHEAD && x->next == NULL) {
+    return prim_car(x->sub);
   }
+
+  Element *e = make_copy(x);
   e->next = NULL;
   return e;
 }
 
 Element *prim_cdr(Element *x) {
-  if (x) {
-    return x->next;
+  if (!x) { return make_error("Cannot call CDR on NULL list."); }
+  if (x->type == T_NONE
+      || x->type == T_ERROR
+      || x->type == T_PRIM
+      || x->type == T_LAMBDA
+      || x->type == T_SYMBOL) {
+    return make_error("Unsupported type %d for prim function CDR.", x->type);
+  } else if (x->type == T_LISTHEAD && x->next == NULL) {
+    return prim_cdr(x->sub);
   }
-  error("Expecting at least 1 element for operation CDR.");
-  return NULL;
+  return x->next ? x->next : none;
 }
 
 Element *prim_cons(Element *x) {
-  error("Operation CONS not implemented.");
-  // TODO: handle >=3 elements in list x
-  if (!x) {
-    return x;
-  } else {
-    Element *y = x->next;
-    // Y has to be an expression(list)
-
-    Element *curr = x;
-    while (curr->next) {
-      curr = curr->next;
-    }
-    curr->next = y;
-    return x;
+  if (!x) { return make_error("Cannot call CONS on NULL list."); }
+  if (x->type == T_NONE
+      || x->type == T_ERROR
+      || x->type == T_PRIM
+      || x->type == T_LAMBDA
+      || x->type == T_SYMBOL) {
+    return make_error("Unsupported type %d for prim function CONS.", x->type);
   }
+
+  Element *y = x->next;
+  if (!y || y->type != T_LISTHEAD){
+    return make_error("Expect 2nd element to be a list for function CONS.");
+  }
+  if (y->next) {
+    return make_error("Expect 2 elements for function CONS.");
+  }
+
+  x->next = y->sub;
+  y->sub = NULL;
+  free_list(y);
+
+  return x;
 }
 
 Element *prim_cond(Element *x) {
-  error("Operation COND not implemented.");
-  return x;
+  return make_error("Operation COND not implemented.");
 }

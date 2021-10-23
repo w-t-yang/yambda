@@ -1,13 +1,21 @@
 + 1 2 3
 + 1 2 -3 4
 
-def a 1
-def b 2
-def c 3
-def d c
+let a 1
+let b 2
+let c 3
+let d c
 + a b c d
 
-def sum +
+let sum +
+ref sum
 sum 1 2 3
 
+sum a b c d
+sum
+
 + 1 (sum 2 3 (+ a)) 4
+
++ (1 2 3)
++ (` 1 2 3)
++ (` (` (` 1 2 3)))

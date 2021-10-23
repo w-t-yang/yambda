@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+int peek(void);
 Element *read_block();
 
 #endif

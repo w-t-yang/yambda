@@ -5,88 +5,74 @@
 #include "../utils.h"
 #include "../funcs.h"
 
-Element *math_sum(Env *env, Element *x) {
+Element *math_sum(Element *x) {
+  if (!x) {return make_error("Invalid parameters for operation SUM"); }
+
   int res = 0;
-  while (x) {
-    if (x->type == T_SYMBOL) {
-      Element *v = reference(env, x->str_v);
-      Element *r = math_sum(env, v);
-      res += r->int_v;
-    } else if (x->type == T_INTEGER) {
+  if (x->type == T_INTEGER) {
+    while (x) {
+      if (x->type != T_INTEGER) {
+        return make_error("Expecting numbers for operation SUM.");
+      }
       res += x->int_v;
-    } else if (x->type == T_LISTHEAD) {
-      Element *v = eval(env, x->args);
-      Element *r = math_sum(env, v);
-      res += r->int_v;
-    } else {
-      error("Expecting numbers for operation PLUS.");
+      x = x->next;
     }
-
-    x = x->next;
+  } else if (x->type == T_LISTHEAD && x->next == NULL) {
+    return math_sum(x->sub);
+  } else {
+    return make_error("Expecting numbers or a single list for operation SUM.");
   }
   return make_integer(res);
 }
 
-Element *math_mul(Env *env, Element *x) {
+Element *math_mul(Element *x) {
+  if (!x) {return make_error("Invalid parameters for operation MULTIPLY"); }
+
   int res = 1;
-  while (x) {
-    if (x->type == T_SYMBOL) {
-      Element *v = reference(env, x->str_v);
-      Element *r = math_mul(env, v);
-      res *= r->int_v;
-    } else if (x->type == T_INTEGER) {
+  if (x->type == T_INTEGER) {
+    while (x) {
+      if (x->type != T_INTEGER) {
+        return make_error("Expecting numbers for operation MULTIPLY.");
+      }
       res *= x->int_v;
-    } else if (x->type == T_LISTHEAD) {
-      Element *v = eval(env, x->args);
-      Element *r = math_mul(env, v);
-      res *= r->int_v;
-    } else {
-      error("Expecting numbers for operation MULTIPLY.");
+      x = x->next;
     }
-
-    x = x->next;
+  } else if (x->type == T_LISTHEAD && x->next == NULL) {
+    return math_mul(x->sub);
+  } else {
+    return make_error(
+        "Expecting numbers or a single list for operation MULTIPLY.");
   }
   return make_integer(res);
 }
 
-Element *math_div(Env *env, Element *x) {
+Element *math_div(Element *x) {
+  if (!x) {return make_error("Invalid parameters for operation MULTIPLY"); }
+
   int res = 0;
   int *p = NULL;
-  while (x) {
-    if (x->type == T_SYMBOL) {
-      Element *v = reference(env, x->str_v);
-      Element *r = math_div(env, v);
-      if (p == NULL) {
-        res = r->int_v;
-        p = &res;
-      } else {
-        res /= r->int_v;
+  if (x->type == T_INTEGER) {
+    while (x) {
+      if (x->type != T_INTEGER) {
+        return make_error("Expecting numbers for operation DIVIDE.");
+      } else if (p != NULL && x->int_v == 0) {
+        return make_error("Divisor cannot be 0.");
       }
-    } else if (x->type == T_INTEGER) {
-      if (x->int_v == 0) {
-        error("Divisor cannot be 0.");
-        return NULL;
-      }
+
       if (p == NULL) {
         res = x->int_v;
         p = &res;
       } else {
         res /= x->int_v;
       }
-    } else if (x->type == T_LISTHEAD) {
-      Element *v = eval(env, x->args);
-      Element *r = math_div(env, v);
-      if (p == NULL) {
-        res = r->int_v;
-        p = &res;
-      } else {
-        res /= r->int_v;
-      }
-    } else {
-      error("Expecting numbers for operation DIVIDE.");
-    }
 
-    x = x->next;
+      x = x->next;
+    }
+  } else if (x->type == T_LISTHEAD && x->next == NULL) {
+    return math_div(x->sub);
+  } else {
+    return make_error(
+        "Expecting numbers or a single list for operation DIVIDE.");
   }
   return make_integer(res);
 }
