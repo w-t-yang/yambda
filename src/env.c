@@ -17,9 +17,8 @@ void _validate_symbol(char *k) {
   }
 }
 
-// TODO:
-// 1. In order to improve performance, re-implment env by hashmap or trie
-// 2. Use nested env, instead of global env
+// TODO: 1. In order to improve performance, re-implment env by hashmap or trie
+// TODO: 2. Use nested env, instead of global env
 
 Env *_make_env_node(char *buffer) {
   Env *env = malloc(24 + EXTRA_SPACE);

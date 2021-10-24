@@ -7,7 +7,6 @@ int main(int argc, char **argv) {
   } else {
     FILE *in = fopen(argv[1] , "r");
     if (!in) { throw("File not found."); }
-    p("File to parse: %s", argv[1]);
     set_instream(&in);
   }
 
