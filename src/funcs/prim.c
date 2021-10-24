@@ -130,14 +130,14 @@ Element *prim_cond(Element *x) {
   if (!x) { return make_error("Cannot call CONS on NULL list."); }
   int i = 0;
   while (x) {
+    if (!x->next) { return x; }
+
     if (x->type == T_ERROR
         || x->type == T_PRIM
         || x->type == T_LAMBDA
         || x->type == T_SYMBOL) {
       return make_error("Expect the %dth element to be an atom for COND.", i);
     }
-
-    if (!x->next) { return none; }
 
     boolean cond = false;
     if (x->type == T_INTEGER && x->int_v != 0) { cond = true; }

@@ -14,5 +14,7 @@ cond c_i_0 1 c_s_0 2 c_l_0 3
 
 cond (cond 0) 1 c_i_1 2
 
-cond 0 1
 cond 1
+cond 0 1
+cond 0 1 "abc"
+cond 0 1 "abc" "def"

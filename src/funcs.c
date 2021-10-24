@@ -76,7 +76,26 @@ Element *last(Element *head) {
   return curr;
 }
 
+boolean _is_pointer_symbol(Element *x) {
+  if (x && x->type == T_SYMBOL) {
+    // Any symbol ends with ':' will be skipped, this is referred as pointer symbol
+    // TODO: make ':' an invalid char if it's not at the end
+    // TODO: when getting a pointer symbol, add a pointer in env, pointing to the next element
+    // For now, just simply ignore this kind of symbols
+    int len = strlen(x->str_v);
+    if (len > 0 && x->str_v[len-1] == ':') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return false;
+}
 Element *pre_eval(Env *env, Element *head) {
+  while (head && _is_pointer_symbol(head)) {
+    head = head->next;
+  }
+
   Element *curr = head;
   Element *prev = NULL;
   while (curr) {
@@ -85,7 +104,15 @@ Element *pre_eval(Env *env, Element *head) {
     if (curr->type == T_LISTHEAD) {
       l = eval(env, curr->sub);
     } else if (curr->type == T_SYMBOL) {
-      l = reference(env, curr);
+      if (_is_pointer_symbol(curr)) {
+        // Since head of the list cannot be pointer symbol, prev cannot NULL at this point
+        // We need to skip current element
+        curr = curr->next;
+        prev->next = curr;
+        continue;
+      } else {
+        l = reference(env, curr);
+      }
     }
 
     if (l) {
@@ -104,6 +131,7 @@ Element *pre_eval(Env *env, Element *head) {
         head = l;
         curr = l;
 
+        // If the keyword is let/def/quote, skip pre_eval the rest of the list
         if (head->type == T_PRIM &&
             (
              head->int_v == K_LET
@@ -111,6 +139,13 @@ Element *pre_eval(Env *env, Element *head) {
              || head->int_v == K_REF
              || head->int_v == K_QUOTE
              ) ) {
+
+          // If the keyword is let, pre_eval the value that will be assigned to symbol
+          if (head->int_v == K_LET && head->next && head->next->next) {
+            Element *r = pre_eval(env, head->next->next);
+            head->next->next = r;
+          }
+
           return head;
         }
       }

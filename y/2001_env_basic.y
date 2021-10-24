@@ -19,6 +19,13 @@ c
 a b c
 
 def a 1
-
 d
 ref d
+
+let e (+ 1 2 3)
+ref e
+e
+
+let f (` 1 2 3)
+ref f
+f
