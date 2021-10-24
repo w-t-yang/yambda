@@ -127,5 +127,31 @@ Element *prim_cons(Element *x) {
 }
 
 Element *prim_cond(Element *x) {
-  return make_error("Operation COND not implemented.");
+  if (!x) { return make_error("Cannot call CONS on NULL list."); }
+  int i = 0;
+  while (x) {
+    if (x->type == T_ERROR
+        || x->type == T_PRIM
+        || x->type == T_LAMBDA
+        || x->type == T_SYMBOL) {
+      return make_error("Expect the %dth element to be an atom for COND.", i);
+    }
+
+    if (!x->next) { return none; }
+
+    boolean cond = false;
+    if (x->type == T_INTEGER && x->int_v != 0) { cond = true; }
+    else if (x->type == T_STRING && !streq(x->str_v, "")) { cond = true; }
+    else if (x->type == T_LISTHEAD && x->sub && x->sub->type != T_NONE) { cond = true;}
+    if (cond) {
+      Element *r = make_copy(x->next);
+      r->next = NULL;
+      return r;
+    }
+
+    if (!x->next->next) { return none; }
+    x = x->next->next;
+    i += 2;
+  }
+  return make_error("Unexpected error for operation COND.");
 }

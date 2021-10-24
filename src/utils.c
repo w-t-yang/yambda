@@ -17,6 +17,8 @@ Element *make_none() {
     Element *ele = alloc(T_NONE, 0);
     _none_ = ele;
   }
+  _none_->next = NULL;
+  _none_->sub = NULL;
   return _none_;
 }
 
