@@ -8,9 +8,23 @@
 
 Element *read_list();
 
+FILE **_in;
+
+void set_instream(FILE **f) {
+  _in = f;
+}
+
+char _get() {
+  return getc(*_in);
+}
+
+void _unget(char c) {
+  ungetc(c, *_in);
+}
+
 int peek(void) {
-  int c = getchar();
-  ungetc(c, stdin);
+  int c = _get();
+  _unget(c);
   return c;
 }
 
@@ -27,7 +41,7 @@ int end_of_element(char c) {
 Element *read_integer() {
   int isnegative = 0;
   if (peek() == '-') {
-    getchar();
+    _get();
     isnegative = 1;
   }
 
@@ -35,10 +49,10 @@ Element *read_integer() {
   buffer[0] = '\0';
 
   for (;;) {
-    char c = getchar();
+    char c = _get();
     if (end_of_element(c)) {
-      // Put '\n', '\r', etc. back to stdin
-      ungetc(c, stdin);
+      // Put '\n', '\r', etc. back to instream
+      _unget(c);
 
       if (strlen(buffer) == 0) {
         return make_error("Invalid integer.");
@@ -58,12 +72,12 @@ Element *read_integer() {
 }
 
 Element *read_string() {
-  char quote = getchar();
+  char quote = _get();
   char *buffer = malloc(BUFFER_SIZE);
   buffer[0] = '\0';
 
   for (;;) {
-    char c = getchar();
+    char c = _get();
     if (c == EOF) {
       return make_error("Invalid string. End of file reached.");
     } else if (c == quote) {
@@ -74,7 +88,7 @@ Element *read_string() {
       }
     } else if ( c == '\\') {
       strncat(buffer, &c, 1);
-      c = getchar();
+      c = _get();
       if (c == EOF) {
         return make_error("Invalid string. End of file reached.");
       }
@@ -95,9 +109,9 @@ Element *read_symbol() {
   buffer[0] = '\0';
 
   for (;;) {
-    char c = getchar();
+    char c = _get();
     if (end_of_element(c)) {
-      ungetc(c, stdin);
+      _unget(c);
       return make_symbol(buffer);
     } else {
       // TODO: check invalid character
@@ -115,7 +129,7 @@ Element *read_element() {
   // 4. Symbol, TODO: Define invalid starting char for a symbol
 
   if (end_of_element(s)) {
-    getchar();
+    _get();
     return none;
   } else if (isdigit(s) || s == '-') {
     return read_integer();
@@ -139,7 +153,7 @@ Element *read_list() {
   int start_with_parenthesis = 0;
   if (peek() == '(') {
     start_with_parenthesis = 1;
-    getchar();
+    _get();
   }
 
   for (;;) {
@@ -154,16 +168,16 @@ Element *read_list() {
       if (c == EOF) {
         return make_error("Unclosed parenthesis.");
       } else if (c == ')') {
-        getchar();
+        _get();
         Element *lh = make_list_head();
         lh->sub = head;
         return lh;
       } else if (c == '\n' || c == '\r') {
         // TODO: support indentation
-        getchar();
+        _get();
         continue;
       } else if (c == ' ') {
-        getchar();
+        _get();
         continue;
       } else {
         ele = read_element();
@@ -172,14 +186,14 @@ Element *read_list() {
       if (c == EOF) {
         return head;
       } else if (c == ')') {
-        getchar();
+        _get();
         return make_error("Invalid parenthesis ')'");
       } else if (c == '\n' || c == '\r') {
         // TODO: support indentation
-        getchar();
+        _get();
         return head;
       } else if (c == ' ') {
-        getchar();
+        _get();
         continue;
       } else {
         ele = read_element();

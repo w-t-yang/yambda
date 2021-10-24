@@ -5,6 +5,9 @@ CFLAGS=-std=gnu99 -g -O2 -Wall
 yambda: clean input.o output.o env.o funcs.o utils.o
 	gcc -o yambda yambda.c input.o output.o env.o math.o prim.o funcs.o utils.o
 
+ydebug: clean input.o output.o env.o funcs.o utils.o
+	gcc -o ydebug ydebug.c input.o output.o env.o math.o prim.o funcs.o utils.o
+
 input.o: src/input.c
 	gcc -c src/input.c
 output.o: src/output.c
@@ -23,7 +26,7 @@ funcs.o: math.o prim.o
 	gcc -c src/funcs.c
 
 clean:
-	rm -f yambda *.o *~
+	rm -f yambda ydebug *.o *~
 
 test: yambda
 	@./test.sh
