@@ -10,6 +10,7 @@
   - [ ] Comparison of list
   - [ ] Review errors - print str instead of integer of type
   - [ ] Provide error context and line number
+  - [ ] Code comments
 
 ** TODOS
 
@@ -44,6 +45,7 @@
      - review errors - print str instead of integer of type
      - indentation error with context
      - line number
+     - code comments
 
 **** TODO Garbage collection
 

@@ -1,6 +1,6 @@
 make ydebug
 
-for t in y/*
+for t in y/debug/*
 do
     echo "-------------------"
     echo "Test file $t"
