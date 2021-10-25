@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "output.h"
 
 Element *alloc(int type, size_t size) {
   size += ELEMENT_MIN_SIZE;
@@ -100,4 +101,27 @@ Element *make_copy(Element *e) {
 void free_list(Element *e) {
   // TODO: properly free a list
   free(e);
+}
+
+Element *tail_of(Element *head) {
+  if (!head) { return make_error("Cannot get the last element of NULL list."); }
+  Element *curr = head;
+  while (curr->next) {
+    curr = curr->next;
+  }
+  return curr;
+}
+
+void push(Node **stack, Element *e) {
+  Node *n = malloc(NODE_SIZE);
+  n->list = e;
+  if (*stack) { n->next = *stack; }
+  *stack = n;
+}
+
+Element *pop(Node **stack){
+  if (!*stack) { return NULL; }
+  Node *n = *stack;
+  *stack = (*stack)->next;
+  return n->list;
 }

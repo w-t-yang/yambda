@@ -43,6 +43,13 @@ struct env{
 typedef struct env Env;
 #define ENV_MIN_SIZE 24
 
+struct node{
+  struct node *next;     // 8 bytes
+  struct element *list; // 8 bytes
+};
+typedef struct node Node;
+#define NODE_SIZE 16
+
 #define streq(x, y) !strcmp(x, y)
 
 //#define ARGS_SYMBOL "@_"

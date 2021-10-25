@@ -21,7 +21,7 @@ void _validate_symbol(char *k) {
 // TODO: 2. Use nested env, instead of global env
 
 Env *_make_env_node(char *buffer) {
-  Env *env = malloc(24 + EXTRA_SPACE);
+  Env *env = malloc(ENV_MIN_SIZE + EXTRA_SPACE);
   env->list = NULL;
   env->next = NULL;
   strcpy(env->symbol, buffer);

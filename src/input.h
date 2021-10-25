@@ -4,7 +4,8 @@
 #include "types.h"
 
 void set_instream(FILE **instream);
-int peek(void);
+char peek(void);
+Element *read_line();
 Element *read_block();
 
 #endif

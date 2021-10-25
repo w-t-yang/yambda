@@ -67,15 +67,6 @@ Element *call_prim(Env *env, Element *head) {
   }
 }
 
-Element *last(Element *head) {
-  if (!head) { return make_error("Cannot get the last element of NULL list."); }
-  Element *curr = head;
-  while (curr->next) {
-    curr = curr->next;
-  }
-  return curr;
-}
-
 boolean _is_pointer_symbol(Element *x) {
   if (x && x->type == T_SYMBOL) {
     // Any symbol ends with ':' will be skipped, this is referred as pointer symbol
@@ -169,13 +160,13 @@ Element *eval(Env *env, Element *head) {
   case T_ERROR:
     return head;
   case T_INTEGER:
-    return last(head);
+    return tail_of(head);
   case T_STRING:
-    return last(head);
+    return tail_of(head);
   case T_SYMBOL:
     return make_error("Unknown symbol %d.", head->str_v);
   case T_LISTHEAD:
-    return last(head);
+    return tail_of(head);
   case T_PRIM:
     return call_prim(env, head);
   case T_LAMBDA:

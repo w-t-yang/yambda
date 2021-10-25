@@ -14,6 +14,10 @@ Element *make_lambda(char *s);
 
 Element *make_copy(Element *e);
 void free_list(Element *e);
+Element *tail_of(Element *head);
+
+void push(Node **stack, Element *e);
+Element *pop(Node **stack);
 
 #define none make_none()
 

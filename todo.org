@@ -2,27 +2,36 @@
 
 ** Next beta release
 
-*** Identation
-*** Lambda
-*** Forloop
-*** test framework
-*** print
-
+  - [X] Indentation
+  - [ ] Lambda
+  - [ ] Forloop
+  - [ ] Test framework
+  - [ ] Print
+  - [ ] Comparison of list
+  - [ ] Review errors - print str instead of integer of type
+  - [ ] Provide error context and line number
 
 ** TODOS
 
 *** Key features
 
-**** TODO Indentation
+**** DONE Indentation
+     CLOSED: [2021-10-25 Mon 01:29]
+     :LOGBOOK:
+     - State "DONE"       from "TODO"       [2021-10-25 Mon 01:29]
+     :END:
 **** TODO Define and call lambda function
 **** TODO Forloop
 **** TODO Tries and hashmap
 **** TODO Nested env
+**** TODO Comparison of list
 
 *** Important changes
 **** TODO Validate Symbol
 **** TODO Proper implementation of pointer symbol
 **** TODO When reading lists, allocate more spaces when buffer is not enough
+**** TODO member accessor, e.g. (123).to_str(args)
+**** TODO Import and evaluate file
 
 *** Bugfix and nice to have
 
@@ -31,6 +40,10 @@
      - test framework
      - deep copy
      - deep free
+     - symbol/str/integer conversion
+     - review errors - print str instead of integer of type
+     - indentation error with context
+     - line number
 
 **** TODO Garbage collection
 
