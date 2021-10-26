@@ -52,10 +52,10 @@ void print_ele(Element *ele, boolean show_type) {
 
   switch (ele->type) {
   case T_NONE:
-    printf("None ");
+    printf("NONE ");
     break;
   case T_ERROR:
-    printf("Error: %s ", ele->str_v);
+    printf("ERROR: %s ", ele->str_v);
     break;
   case T_INTEGER:
     printf("%d ", ele->int_v);
@@ -93,6 +93,7 @@ void print_list(Element *curr) {
     print_ele(curr, false);
     curr = curr->next;
   }
+  printf("\n");
 }
 
 void print_env(Env *env) {

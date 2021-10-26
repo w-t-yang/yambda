@@ -50,8 +50,6 @@ struct node{
 typedef struct node Node;
 #define NODE_SIZE 16
 
-#define streq(x, y) !strcmp(x, y)
-
 //#define ARGS_SYMBOL "@_"
 //static int ERROR_FLAG = 0;
 

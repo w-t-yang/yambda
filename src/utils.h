@@ -19,6 +19,9 @@ Element *tail_of(Element *head);
 void push(Node **stack, Element *e);
 Element *pop(Node **stack);
 
+boolean streq(char *x, char *y);
+boolean lsteq(Element *x, Element *y);
+
 #define none make_none()
 
 #endif

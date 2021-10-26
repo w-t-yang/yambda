@@ -29,10 +29,10 @@ Element *prim_atom(Element *x) {
     if (x->sub == NULL || (x->sub->type == T_NONE)) {
       return make_integer(1);
     } else {
-      return none;
+      return make_integer(0);
     }
   } else {
-    return none;
+    return make_integer(0);
   }
 }
 
@@ -50,21 +50,27 @@ Element *prim_eq(Element *x) {
   }
 
   if (x && x->next) {
+    boolean res = false;
     Element *a = x;
     Element *b = x->next;
+    x->next = NULL;
+
     if (a->type != b->type) {
-      return none;
+      res = false;
     } else if (a->type == T_NONE) {
-      return make_integer(1);
+      res = true;
     } else if (a->type == T_INTEGER && a->int_v == b->int_v) {
-      return make_integer(1);
+      res = 1;
     } else if (a->type == T_STRING && streq(a->str_v, b->str_v)) {
-      return make_integer(1);
-    } else if (x->type == T_LISTHEAD){
-      return make_error("Comparison of lists is not implemented.");
+      res = 1;
+    } else if (x->type == T_LISTHEAD && lsteq(a, b)){
+      res = 1;
     } else {
-      return none;
+      res = 0;
     }
+    x->next = b;
+    if (res) {return make_integer(1);}
+    else {return make_integer(0);}
   }
 
   return make_error("Expect two elements for operation EQ.");
@@ -81,7 +87,6 @@ Element *prim_car(Element *x) {
   } else if (x->type == T_LISTHEAD && x->next == NULL) {
     return prim_car(x->sub);
   }
-
   Element *e = make_copy(x);
   e->next = NULL;
   return e;
@@ -123,7 +128,10 @@ Element *prim_cons(Element *x) {
   y->sub = NULL;
   free_list(y);
 
-  return x;
+  Element *h = make_list_head();
+  h->sub = x;
+
+  return h;
 }
 
 Element *prim_cond(Element *x) {

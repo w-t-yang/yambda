@@ -100,6 +100,9 @@ Element *let(Env *env, Element *x) {
       || x->type != T_SYMBOL) {
     return make_error("Invalid params for operation LET");
   }
+  if (x->next->next) {
+    return make_error("Expect 2 elements for operation LET");
+  }
   _validate_symbol(x->str_v);
 
   // TODO: check whether x can be changed

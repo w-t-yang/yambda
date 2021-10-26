@@ -1,13 +1,12 @@
 * Yambda
 
-** Next beta release
-
+** Next beta release [3/9]
   - [X] Indentation
   - [ ] Lambda
   - [ ] Forloop
-  - [ ] Test framework
+  - [X] Test framework
   - [ ] Print
-  - [ ] Comparison of list
+  - [X] Comparison of list
   - [ ] Review errors - print str instead of integer of type
   - [ ] Provide error context and line number
   - [ ] Code comments
@@ -25,7 +24,12 @@
 **** TODO Forloop
 **** TODO Tries and hashmap
 **** TODO Nested env
-**** TODO Comparison of list
+**** DONE Comparison of list
+     CLOSED: [2021-10-25 Mon 23:20]
+     :LOGBOOK:
+     - State "DONE"       from "TODO"       [2021-10-25 Mon 23:20]
+     :END:
+
 
 *** Important changes
 **** TODO Validate Symbol
@@ -36,16 +40,16 @@
 
 *** Bugfix and nice to have
 
-**** TODO Utility functions
-     - print
-     - test framework
-     - deep copy
-     - deep free
-     - symbol/str/integer conversion
-     - review errors - print str instead of integer of type
-     - indentation error with context
-     - line number
-     - code comments
+**** TODO Utility functions [2/9]
+     - [ ] print
+     - [X] test framework
+     - [ ] deep copy
+     - [ ] deep free
+     - [ ] symbol/str/integer conversion
+     - [ ] review errors - print str instead of integer of type
+     - [X] indentation error with context
+     - [ ] line number
+     - [ ] code comments
 
 **** TODO Garbage collection
 

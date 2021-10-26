@@ -17,7 +17,10 @@ int main(int argc, char **argv) {
     cnt ++;
 
     Element *ele = read_block();
-    if (!ele) continue;
+    if (!ele) {
+      if (peek() == EOF) { exit(1); }
+      continue;
+    }
 
     printf("List: ");
     plst(ele);

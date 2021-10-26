@@ -1,5 +1,5 @@
-#include "utils.h"
 #include "output.h"
+#include "utils.h"
 
 Element *alloc(int type, size_t size) {
   size += ELEMENT_MIN_SIZE;
@@ -104,7 +104,7 @@ void free_list(Element *e) {
 }
 
 Element *tail_of(Element *head) {
-  if (!head) { return make_error("Cannot get the last element of NULL list."); }
+  if (!head) { return NULL; }
   Element *curr = head;
   while (curr->next) {
     curr = curr->next;
@@ -124,4 +124,45 @@ Element *pop(Node **stack){
   Node *n = *stack;
   *stack = (*stack)->next;
   return n->list;
+}
+
+boolean streq(char *x, char *y) {
+  return !strcmp(x, y);
+}
+
+Element *_extract_list(Element *x) {
+  while (x && x->next == NULL && x->type == T_LISTHEAD) {
+    x = x->sub;
+  }
+  return x;
+}
+
+boolean lsteq(Element *x, Element *y) {
+  x = _extract_list(x);
+  y = _extract_list(y);
+  while (x && y) {
+    if (x->type != y->type) {
+      return false;
+    } else {
+      if (x->type == T_NONE || x->type == T_ERROR) {
+        return true;
+      } else if (x->type == T_INTEGER || x->type == T_PRIM) {
+        if (x->int_v != y->int_v) { return false; }
+      } else if (x->type == T_SYMBOL || x->type == T_STRING || x->type == T_LAMBDA) {
+        if (!streq(x->str_v, y->str_v)) { return false; }
+      } else if (x->type == T_LISTHEAD) {
+        if (!lsteq(x->sub, y->sub)) { return false; }
+      } else {
+        return false;
+      }
+    }
+    x = x->next;
+    y = y->next;
+  }
+
+  if (!x && !y) {
+    return true;
+  } else {
+    return false;
+  }
 }

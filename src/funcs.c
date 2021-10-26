@@ -33,6 +33,10 @@ Element *call_prim(Env *env, Element *head) {
   Element *list = head->next;
 
   switch (head->int_v) {
+  case K_NONE:
+    return make_none();
+  case K_ERROR:
+    return make_error("Error object for comparison.");
   case K_LET:
     return let(env, list);
   case K_DEF:
@@ -73,8 +77,9 @@ boolean _is_pointer_symbol(Element *x) {
     // TODO: make ':' an invalid char if it's not at the end
     // TODO: when getting a pointer symbol, add a pointer in env, pointing to the next element
     // For now, just simply ignore this kind of symbols
+    // Symbol ends with ',' will be skipped as well, but will not be used as pointer
     int len = strlen(x->str_v);
-    if (len > 0 && x->str_v[len-1] == ':') {
+    if (len > 0 && (x->str_v[len-1] == ':' || x->str_v[len-1] == ',')) {
       return true;
     } else {
       return false;
@@ -82,6 +87,7 @@ boolean _is_pointer_symbol(Element *x) {
   }
   return false;
 }
+
 Element *pre_eval(Env *env, Element *head) {
   while (head && _is_pointer_symbol(head)) {
     head = head->next;
@@ -149,7 +155,6 @@ Element *pre_eval(Env *env, Element *head) {
 }
 
 Element *eval(Env *env, Element *head) {
-  Element *res = NULL;
   if (!head) { return NULL; }
 
   head = pre_eval(env, head);
@@ -160,13 +165,21 @@ Element *eval(Env *env, Element *head) {
   case T_ERROR:
     return head;
   case T_INTEGER:
-    return tail_of(head);
+    return make_copy(tail_of(head));
   case T_STRING:
-    return tail_of(head);
+    return make_copy(tail_of(head));
   case T_SYMBOL:
     return make_error("Unknown symbol %d.", head->str_v);
   case T_LISTHEAD:
-    return tail_of(head);
+    // TODO: 1. review the use of make_copy
+    // TODO: 2. review if this could happen in other situations
+    // TODO: 3. write tests
+    // We need to make a copy of the tail of a list because,
+    // pre_eval will try to use the tail to replace a list.
+    // Then it can point its next pointer to another Element,
+    // Thus the original list may be changed.
+    //return tail_of(head);
+    return make_copy(tail_of(head));
   case T_PRIM:
     return call_prim(env, head);
   case T_LAMBDA:

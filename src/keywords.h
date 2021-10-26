@@ -3,6 +3,8 @@
 
 enum {
   K_EMPTY = 0,
+  K_NONE,
+  K_ERROR,
 
   K_LET,
   K_DEF,
@@ -23,9 +25,11 @@ enum {
   KEYWORDS_COUNT,
 };
 
-#define KEYWORD_MAX_LENGTH 5
+#define KEYWORD_MAX_LENGTH 6
 static char KEYWORDS[KEYWORDS_COUNT][KEYWORD_MAX_LENGTH] = {
   "",
+  "NONE",
+  "ERROR",
 
   "let",
   "def",
