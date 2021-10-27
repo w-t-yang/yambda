@@ -15,7 +15,13 @@ void set_instream(FILE **f) {
 }
 
 char _getc() {
-  return getc(*_in);
+  char c = getc(*_in);
+  if (c == '#') {
+    while(c != '\r' && c != '\n' && c != EOF) {
+      c = _getc();
+    }
+  }
+  return c;
 }
 
 void _ungetc(char c) {
@@ -283,7 +289,6 @@ Element *read_line_as_single_ele() {
   return head;
 }
 
-#define IND_UNIT 4
 Element *read_block() {
   int ind = _get_indentation();
   if (ind != 0) { return _make_indentation_error(); }
