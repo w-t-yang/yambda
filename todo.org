@@ -37,6 +37,7 @@
 **** TODO When reading lists, allocate more spaces when buffer is not enough
 **** TODO member accessor, e.g. (123).to_str(args)
 **** TODO Import and evaluate file
+**** TODO String manipulation
 
 *** Bugfix and nice to have
 

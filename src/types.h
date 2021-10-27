@@ -16,14 +16,14 @@ enum {
   T_STRING,
   T_SYMBOL,
   T_LISTHEAD,
-  T_FUNCS,
+  T_FUNC,
   T_LAMBDA,
 };
 
 enum {
   // Values
-  V_LIST_UNEVALED = 0,
-  V_LIST_EVALED,
+  V_NORMAL_SYMBOL = 0,
+  V_ARG_SYMBOL,
 };
 
 struct element{

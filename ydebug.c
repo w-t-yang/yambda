@@ -22,11 +22,14 @@ int main(int argc, char **argv) {
       continue;
     }
 
-    printf("List: ");
+    p("List: ");
     plst(ele);
+    p("Deep Copy: ");
+    Element *copy = make_deep_copy(ele);
+    plst(copy);
 
-    Element *res = eval(env, ele);
-    printf("\nEval: ");
+    Element *res = eval(env, copy);
+    p("Eval: ");
     plst(res);
 
     printf("\n\n");

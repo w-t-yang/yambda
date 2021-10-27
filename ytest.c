@@ -39,7 +39,11 @@ int main(int argc, char **argv) {
     }
 
     if (peek() == EOF) {
-      p("Summary: %d out of %d tests failed.", failed_cnt, cnt);
+      if (failed_cnt) {
+        p("Summary: %d out of %d tests failed.", failed_cnt, cnt);
+      } else {
+        p("Summary: all %d tests passed.", cnt);
+      }
       p("---------------------------");
       exit(1);
     }

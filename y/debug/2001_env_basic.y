@@ -35,15 +35,6 @@ c
 a b c
 1
 
-def a 1
-error
-
-d
-error
-
-ref d
-error
-
 let e (+ 1 2 3)
 6
 
@@ -61,3 +52,12 @@ ref f
 
 f
 (` 2 3 4)
+
+1 (let a 2) (3 a) 4
+4
+
+1 (let a 2) (3 a)
+2
+
+1 (let a 2) (3 4) a
+2

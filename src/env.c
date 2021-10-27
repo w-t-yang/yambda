@@ -6,15 +6,18 @@ boolean _is_keyword(char *k) {
   for (int i = 0; i < KEYWORDS_COUNT; i++) {
     if (streq(k, KEYWORDS[i])) {
       return true;
+    } else if(k[0] == '$') {
+      return true;
     }
   }
   return false;
 }
 
-void _validate_symbol(char *k) {
-  if (_is_keyword(k)) {
-    throw("Cannot use \"%s\" as environment symbol.", k);
+Element *_validate_symbol(Element *symbol) {
+  if (_is_keyword(symbol->str_v)) {
+    return make_error("Cannot use reserved symbol \"%s\".", symbol->str_v);
   }
+  return NULL;
 }
 
 // TODO: 1. In order to improve performance, re-implment env by hashmap or trie
@@ -52,9 +55,8 @@ Element *_env_unset(Env *env, char *symbol) {
   return make_error("Symbol \"%s\" not found.", symbol);
 }
 
-Element *_env_set(Env *env, char *symbol, Element *list) {
-
-
+Element *env_set(Env *env, char *symbol, Element *list) {
+  // TODO: Whenever setting an env node, we need to make a deep copy of the list
   if (strlen(symbol) == 0) {
     return make_error("Invalid symbol name \"%s\".", symbol);
   }
@@ -89,7 +91,7 @@ Env *env_init() {
   strcpy(env->symbol, "");
 
   for (int i = 0; i < KEYWORDS_COUNT; i++) {
-    _env_set(env, KEYWORDS[i], make_prim(i));
+    env_set(env, KEYWORDS[i], make_func(i));
   }
   return env;
 }
@@ -103,11 +105,12 @@ Element *let(Env *env, Element *x) {
   if (x->next->next) {
     return make_error("Expect 2 elements for operation LET");
   }
-  _validate_symbol(x->str_v);
+  Element *error = _validate_symbol(x);
+  if (error) { return error; }
 
   // TODO: check whether x can be changed
-  _env_set(env, x->str_v, x->next);
-  return x->next;
+  env_set(env, x->str_v, x->next);
+  return make_copy(x->next);
 }
 
 Element *define(Env *env, Element *x) {
@@ -117,7 +120,8 @@ Element *define(Env *env, Element *x) {
     return make_error("Invalid params for operation DEF");
   }
 
-  _validate_symbol(x->str_v);
+  Element *error = _validate_symbol(x);
+  if (error) { return error; }
 
   // TODO: check whether x can be changed
   return make_error("`DEF` not implemented.");
@@ -129,7 +133,7 @@ Element *reference(Env *env, Element *x) {
     return make_error("Invalid params for operation REF");
   }
 
-  // TODO: check whether e can be changed
+  // TODO: check whether e/e->tail/e->sub can be changed
   Element *e = _env_get(env, x->str_v);
   if (e && e->type == T_SYMBOL) {
     return reference(env, e);

@@ -13,7 +13,7 @@ Element *prim_quote(Element *x) {
 Element *prim_atom(Element *x) {
   if (!x) { return make_error("Cannot call ATOM on NULL list."); }
   if (x->type == T_ERROR
-      || x->type == T_FUNCS
+      || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
     return make_error("Unsupported type %d for prim function ATOM.", x->type);
@@ -39,7 +39,7 @@ Element *prim_atom(Element *x) {
 Element *prim_eq(Element *x) {
   if (!x) { return make_error("Cannot call EQ on NULL list."); }
   if (x->type == T_ERROR
-      || x->type == T_FUNCS
+      || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
     return make_error("Unsupported type %d for prim function EQ.", x->type);
@@ -80,7 +80,7 @@ Element *prim_car(Element *x) {
   if (!x) { return make_error("Cannot call CAR on NULL list."); }
   if (x->type == T_NONE
       || x->type == T_ERROR
-      || x->type == T_FUNCS
+      || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
     return make_error("Unsupported type %d for prim function CAR.", x->type);
@@ -96,7 +96,7 @@ Element *prim_cdr(Element *x) {
   if (!x) { return make_error("Cannot call CDR on NULL list."); }
   if (x->type == T_NONE
       || x->type == T_ERROR
-      || x->type == T_FUNCS
+      || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
     return make_error("Unsupported type %d for prim function CDR.", x->type);
@@ -110,7 +110,7 @@ Element *prim_cons(Element *x) {
   if (!x) { return make_error("Cannot call CONS on NULL list."); }
   if (x->type == T_NONE
       || x->type == T_ERROR
-      || x->type == T_FUNCS
+      || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
     return make_error("Unsupported type %d for prim function CONS.", x->type);
@@ -141,7 +141,7 @@ Element *prim_cond(Element *x) {
     if (!x->next) { return x; }
 
     if (x->type == T_ERROR
-        || x->type == T_FUNCS
+        || x->type == T_FUNC
         || x->type == T_LAMBDA
         || x->type == T_SYMBOL) {
       return make_error("Expect the %dth element to be an atom for COND.", i);

@@ -75,7 +75,7 @@ void print_ele(Element *ele, boolean show_type) {
     }
     printf("\b) ");
     break;
-  case T_FUNCS:
+  case T_FUNC:
     printf("%s ", ele->str_v);
     break;
   case T_LAMBDA:
@@ -93,7 +93,6 @@ void print_list(Element *curr) {
     print_ele(curr, false);
     curr = curr->next;
   }
-  printf("\n");
 }
 
 void print_env(Env *env) {

@@ -22,10 +22,13 @@ enum {
   K_CONS,
   K_COND,
 
+  K_FOREACH,
+  K_PRINT,
+
   KEYWORDS_COUNT,
 };
 
-#define KEYWORD_MAX_LENGTH 6
+#define KEYWORD_MAX_LENGTH 8
 static char KEYWORDS[KEYWORDS_COUNT][KEYWORD_MAX_LENGTH] = {
   "",
   "NONE",
@@ -46,6 +49,9 @@ static char KEYWORDS[KEYWORDS_COUNT][KEYWORD_MAX_LENGTH] = {
   "cdr",
   "cons",
   "cond",
+
+  "foreach",
+  "print",
 };
 
 #endif

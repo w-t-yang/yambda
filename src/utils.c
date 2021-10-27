@@ -55,6 +55,11 @@ Element *make_integer(int x) {
 Element *make_string(char *buffer) {
   Element *ele = alloc(T_STRING, EXTRA_SPACE);
   strcpy(ele->str_v, buffer);
+  if (ele->str_v[0] == '$') {
+    ele->int_v = V_ARG_SYMBOL;
+  } else {
+    ele->int_v = V_NORMAL_SYMBOL;
+  }
   return ele;
 }
 
@@ -67,13 +72,12 @@ Element *make_symbol(char *buffer) {
 
 Element *make_list_head() {
   Element *ele = alloc(T_LISTHEAD, 0);
-  ele->int_v = V_LIST_UNEVALED;
   return ele;
 }
 
-Element *make_prim(int index) {
+Element *make_func(int index) {
   char *buffer = KEYWORDS[index];
-  Element *ele = alloc(T_FUNCS, EXTRA_SPACE);
+  Element *ele = alloc(T_FUNC, EXTRA_SPACE);
   ele->int_v = index;
   strcpy(ele->str_v, buffer);
   return ele;
@@ -85,8 +89,7 @@ Element *make_lambda(char *buffer) {
   return ele;
 }
 
-Element *make_copy(Element *e) {
-  // TODO: consider deep copy
+Element *_copy_node(Element *e) {
   int has_str = (strlen(e->str_v) > 0);
   int bytes_for_str = has_str ? strlen(e->str_v) + 1 - 8 : 0;
 
@@ -96,6 +99,33 @@ Element *make_copy(Element *e) {
   ele->next = e->next;
   ele->sub = e->sub;
   return ele;
+}
+
+// TODO: all usage of make_copy needs to be examined and tested
+Element *make_copy(Element *e) {
+  return _copy_node(e);
+}
+
+Element *make_deep_copy(Element *e) {
+  Element *head = NULL;
+  Element *prev = NULL;
+  while (e) {
+    Element *c = make_copy(e);
+    if (!head) {
+      head = c;
+      prev = c;
+    } else {
+      prev->next = c;
+      prev = c;
+    }
+
+    if (e->sub) {
+      c->sub = make_deep_copy(e->sub);
+    }
+
+    e = e->next;
+  }
+  return head;
 }
 
 void free_list(Element *e) {
@@ -146,7 +176,7 @@ boolean lsteq(Element *x, Element *y) {
     } else {
       if (x->type == T_NONE || x->type == T_ERROR) {
         return true;
-      } else if (x->type == T_INTEGER || x->type == T_FUNCS) {
+      } else if (x->type == T_INTEGER || x->type == T_FUNC) {
         if (x->int_v != y->int_v) { return false; }
       } else if (x->type == T_SYMBOL || x->type == T_STRING || x->type == T_LAMBDA) {
         if (!streq(x->str_v, y->str_v)) { return false; }

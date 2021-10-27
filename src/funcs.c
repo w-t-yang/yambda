@@ -3,6 +3,7 @@
 #include "output.h"
 #include "utils.h"
 
+#include "funcs/elmt.h"
 #include "funcs/math.h"
 #include "funcs/prim.h"
 
@@ -26,9 +27,9 @@ Element *apply(Env *env, Element *lambda, Element *args) {
   return res;
 }
 
-Element *call_prim(Env *env, Element *head) {
-  if (!head) { return make_error("Cannot call prim function with NULL list."); }
-  if (head->type != T_FUNCS) { return make_error("Invalid type for prim function."); }
+Element *call_func(Env *env, Element *head) {
+  if (!head) { return make_error("Cannot call function with NULL list."); }
+  if (head->type != T_FUNC) { return make_error("Invalid function."); }
 
   Element *list = head->next;
 
@@ -66,6 +67,11 @@ Element *call_prim(Env *env, Element *head) {
   case K_COND:
     return prim_cond(list);
 
+  case K_FOREACH:
+    return elmt_foreach(env, list);
+  case K_PRINT:
+    return elmt_print(list);
+
   default:
     return make_error("Unknow prim type %d.", head->int_v);
   }
@@ -88,7 +94,9 @@ boolean _is_pointer_symbol(Element *x) {
   return false;
 }
 
-Element *pre_eval(Env *env, Element *head) {
+Element *pre_eval(Env *env, Element *source) {
+  Element *head = make_deep_copy(source);
+
   while (head && _is_pointer_symbol(head)) {
     head = head->next;
   }
@@ -128,17 +136,21 @@ Element *pre_eval(Env *env, Element *head) {
         head = l;
         curr = l;
 
-        // If the keyword is let/def/quote, skip pre_eval the rest of the list
-        if (head->type == T_FUNCS &&
+        // If the keyword is let/def/ref/quote/foreach/print, skip pre_eval the rest of the list
+        if (head->type == T_FUNC &&
             (
              head->int_v == K_LET
              || head->int_v == K_DEF
              || head->int_v == K_REF
              || head->int_v == K_QUOTE
+             || head->int_v == K_FOREACH
+             || head->int_v == K_PRINT
              ) ) {
 
           // If the keyword is let, pre_eval the value that will be assigned to symbol
-          if (head->int_v == K_LET && head->next && head->next->next) {
+          if ((head->int_v == K_LET || head->int_v == K_DEF)
+              && head->next
+              && head->next->next) {
             Element *r = pre_eval(env, head->next->next);
             head->next->next = r;
           }
@@ -180,8 +192,8 @@ Element *eval(Env *env, Element *head) {
     // Thus the original list may be changed.
     //return tail_of(head);
     return make_copy(tail_of(head));
-  case T_FUNCS:
-    return call_prim(env, head);
+  case T_FUNC:
+    return call_func(env, head);
   case T_LAMBDA:
     //TODO: call_lambda(env, head);
     return make_error("Evaluating of lambda is not implemented");

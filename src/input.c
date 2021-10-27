@@ -161,10 +161,10 @@ Element *read_string() {
 
 Element *read_symbol() {
   // Notice:
-  // T_FUNCS and T_LAMBDA will be read as T_SYMBOL.
+  // T_FUNC and T_LAMBDA will be read as T_SYMBOL.
   // This is not a problem because,
-  // when referencing symbol of T_FUNCS/T_LAMBDA,
-  // we will eventually get the T_FUNCS/T_LAMBDA element from the Environment.
+  // when referencing symbol of T_FUNC/T_LAMBDA,
+  // we will eventually get the T_FUNC/T_LAMBDA element from the Environment.
   char *buffer = malloc(BUFFER_SIZE);
   buffer[0] = '\0';
 
