@@ -73,7 +73,7 @@ Element *make_list_head() {
 
 Element *make_prim(int index) {
   char *buffer = KEYWORDS[index];
-  Element *ele = alloc(T_PRIM, EXTRA_SPACE);
+  Element *ele = alloc(T_FUNCS, EXTRA_SPACE);
   ele->int_v = index;
   strcpy(ele->str_v, buffer);
   return ele;
@@ -146,7 +146,7 @@ boolean lsteq(Element *x, Element *y) {
     } else {
       if (x->type == T_NONE || x->type == T_ERROR) {
         return true;
-      } else if (x->type == T_INTEGER || x->type == T_PRIM) {
+      } else if (x->type == T_INTEGER || x->type == T_FUNCS) {
         if (x->int_v != y->int_v) { return false; }
       } else if (x->type == T_SYMBOL || x->type == T_STRING || x->type == T_LAMBDA) {
         if (!streq(x->str_v, y->str_v)) { return false; }

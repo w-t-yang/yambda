@@ -75,7 +75,7 @@ void print_ele(Element *ele, boolean show_type) {
     }
     printf("\b) ");
     break;
-  case T_PRIM:
+  case T_FUNCS:
     printf("%s ", ele->str_v);
     break;
   case T_LAMBDA:

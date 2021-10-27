@@ -16,7 +16,7 @@ enum {
   T_STRING,
   T_SYMBOL,
   T_LISTHEAD,
-  T_PRIM,
+  T_FUNCS,
   T_LAMBDA,
 };
 

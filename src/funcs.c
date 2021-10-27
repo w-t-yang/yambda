@@ -28,7 +28,7 @@ Element *apply(Env *env, Element *lambda, Element *args) {
 
 Element *call_prim(Env *env, Element *head) {
   if (!head) { return make_error("Cannot call prim function with NULL list."); }
-  if (head->type != T_PRIM) { return make_error("Invalid type for prim function."); }
+  if (head->type != T_FUNCS) { return make_error("Invalid type for prim function."); }
 
   Element *list = head->next;
 
@@ -129,7 +129,7 @@ Element *pre_eval(Env *env, Element *head) {
         curr = l;
 
         // If the keyword is let/def/quote, skip pre_eval the rest of the list
-        if (head->type == T_PRIM &&
+        if (head->type == T_FUNCS &&
             (
              head->int_v == K_LET
              || head->int_v == K_DEF
@@ -180,7 +180,7 @@ Element *eval(Env *env, Element *head) {
     // Thus the original list may be changed.
     //return tail_of(head);
     return make_copy(tail_of(head));
-  case T_PRIM:
+  case T_FUNCS:
     return call_prim(env, head);
   case T_LAMBDA:
     //TODO: call_lambda(env, head);
