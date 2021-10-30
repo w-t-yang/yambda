@@ -28,8 +28,8 @@ Element *apply(Env *env, Element *lambda, Element *args) {
 }
 
 Element *call_func(Env *env, Element *head) {
-  if (!head) { return make_error("Cannot call function with NULL list."); }
-  if (head->type != T_FUNC) { return make_error("Invalid function."); }
+  if (!head) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "eval"); }
+  if (head->type != T_FUNC) { return make_error(ERR_FUNCTION_INVALID); }
 
   Element *list = head->next;
 
@@ -37,7 +37,7 @@ Element *call_func(Env *env, Element *head) {
   case K_NONE:
     return make_none();
   case K_ERROR:
-    return make_error("Error object for comparison.");
+    return make_error(ERR_WITH_NO_MESSAGE);
   case K_LET:
     return let(env, list);
   case K_DEF:
@@ -73,7 +73,7 @@ Element *call_func(Env *env, Element *head) {
     return elmt_print(list);
 
   default:
-    return make_error("Unknow prim type %d.", head->int_v);
+    return make_error(ERR_FUNCTION_INT_X_UNKNOWN, head->int_v);
   }
 }
 
@@ -181,7 +181,7 @@ Element *eval(Env *env, Element *head) {
   case T_STRING:
     return make_copy(tail_of(head));
   case T_SYMBOL:
-    return make_error("Unknown symbol %d.", head->str_v);
+    return make_error(ERR_SYMBOL_X_NOT_FOUND, head->str_v);
   case T_LISTHEAD:
     // TODO: 1. review the use of make_copy
     // TODO: 2. review if this could happen in other situations
@@ -196,8 +196,8 @@ Element *eval(Env *env, Element *head) {
     return call_func(env, head);
   case T_LAMBDA:
     //TODO: call_lambda(env, head);
-    return make_error("Evaluating of lambda is not implemented");
+    return make_error(ERR_FUNCTION_X_NOT_IMPLEMENTED, "lambda");
   default:
-    return make_error("Unknown element type %d.", head->type);
+    return make_error(ERR_ELEMENT_INT_X_UNKNOWN, head->type);
   }
 }

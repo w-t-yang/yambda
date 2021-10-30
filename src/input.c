@@ -85,7 +85,7 @@ int _peek_indentation() {
 Element *_make_indentation_error() {
   char *msg = malloc(MSG_BUFFER_SIZE);
   _kill_line_with_msg(MSG_BUFFER_SIZE, &msg);
-  return make_error("Invalid indentation at \"%s\".", msg);
+  return make_error(ERR_INDENTATION_INVALID_AROUND_X, msg);
 }
 
 int end_of_element(char c) {
@@ -115,7 +115,7 @@ Element *read_integer() {
       _ungetc(c);
 
       if (strlen(buffer) == 0) {
-        return make_error("Invalid integer.");
+        return make_error(ERR_INTEGER_X_INVALID, buffer);
       } else {
         int i = atoi(buffer);
         if (isnegative) { i = -i; }
@@ -125,7 +125,8 @@ Element *read_integer() {
       if (isdigit(c)) {
         strncat(buffer, &c, 1);
       } else {
-        return make_error("Invalid integer \"%s%c...\"", buffer, c);
+        strncat(buffer, &c, 1);
+        return make_error(ERR_INTEGER_X_INVALID, buffer);
       }
     }
   }
@@ -139,18 +140,18 @@ Element *read_string() {
   for (;;) {
     char c = _getc();
     if (c == EOF) {
-      return make_error("Invalid string. End of file reached.");
+      return make_error(ERR_STRING_EOF_REACHED);
     } else if (c == quote) {
       if (end_of_element(peek())){
         return make_string(buffer);
       } else {
-        return make_error("End of string should be followed by whitespace.");
+        return make_error(ERR_STRING_END_WITHOUT_WHITESPACE);
       }
     } else if ( c == '\\') {
       strncat(buffer, &c, 1);
       c = _getc();
       if (c == EOF) {
-        return make_error("Invalid string. End of file reached.");
+        return make_error(ERR_STRING_EOF_REACHED);
       }
       strncat(buffer, &c, 1);
     } else {
@@ -221,12 +222,12 @@ Element *read_list() {
     Element *ele = NULL;
 
     if (c == '\t') {
-      return make_error("DO NOT use \\t in yambda script.");
+      return make_error(ERR_FORMAT_NO_SLASH_T);
     }
 
     if (start_with_parenthesis) {
       if (c == EOF) {
-        return make_error("Unclosed parenthesis.");
+        return make_error(ERR_PAREN_INVALID);
       } else if (c == ')') {
         _getc();
         Element *lh = make_list_head();
@@ -247,7 +248,7 @@ Element *read_list() {
         return head;
       } else if (c == ')') {
         _getc();
-        return make_error("Invalid parenthesis ')'");
+        return make_error(ERR_PAREN_INVALID);
       } else if (c == '\n' || c == '\r') {
         // TODO: support indentation
         _getc();

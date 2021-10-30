@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "errors.h"
 #include "keywords.h"
 
 enum {
@@ -18,6 +19,20 @@ enum {
   T_LISTHEAD,
   T_FUNC,
   T_LAMBDA,
+
+  TYPES_COUNT
+};
+
+#define TYPE_MAX_LENGTH 9
+static char TYPES[TYPES_COUNT][TYPE_MAX_LENGTH] = {
+  "None",
+  "Error",
+  "Integer",
+  "String",
+  "Symbol",
+  "List",
+  "Function",
+  "Lambda",
 };
 
 enum {

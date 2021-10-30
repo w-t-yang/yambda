@@ -15,7 +15,7 @@ boolean _is_keyword(char *k) {
 
 Element *_validate_symbol(Element *symbol) {
   if (_is_keyword(symbol->str_v)) {
-    return make_error("Cannot use reserved symbol \"%s\".", symbol->str_v);
+    return make_error(ERR_SYMBOL_X_IS_RESERVED, symbol->str_v);
   }
   return NULL;
 }
@@ -39,7 +39,7 @@ Element *_env_get(Env *env, char *symbol) {
     }
     curr = curr->next;
   }
-  return make_error("Symbol \"%s\" not found.", symbol);
+  return make_error(ERR_SYMBOL_X_NOT_FOUND, symbol);
 }
 
 Element *_env_unset(Env *env, char *symbol) {
@@ -52,16 +52,16 @@ Element *_env_unset(Env *env, char *symbol) {
     }
     curr = curr->next;
   }
-  return make_error("Symbol \"%s\" not found.", symbol);
+  return make_error(ERR_SYMBOL_X_NOT_FOUND, symbol);
 }
 
 Element *env_set(Env *env, char *symbol, Element *list) {
   // TODO: Whenever setting an env node, we need to make a deep copy of the list
   if (strlen(symbol) == 0) {
-    return make_error("Invalid symbol name \"%s\".", symbol);
+    return make_error(ERR_SYMBOL_X_INVALID, symbol);
   }
   if (!env) {
-    return make_error("Environment is not initialized.");
+    return make_error(ERR_ENV_NOT_INITED);
   }
 
   Env *curr = env;
@@ -81,7 +81,7 @@ Element *env_set(Env *env, char *symbol, Element *list) {
       return e->list;
     }
   }
-  return make_error("This error is not expected.");
+  return make_error(ERR_UNEXPECTED_FOR_X, "env_set");
 }
 
 Env *env_init() {
@@ -99,11 +99,9 @@ Env *env_init() {
 Element *let(Env *env, Element *x) {
   if (x == NULL
       || x->next == NULL
-      || x->type != T_SYMBOL) {
-    return make_error("Invalid params for operation LET");
-  }
-  if (x->next->next) {
-    return make_error("Expect 2 elements for operation LET");
+      || x->type != T_SYMBOL
+      || x->next->next) {
+    return make_error(ERR_FUNCTION_X_EXPECTS_Y, "let", "a symbol and a list");
   }
   Element *error = _validate_symbol(x);
   if (error) { return error; }
@@ -117,20 +115,20 @@ Element *define(Env *env, Element *x) {
   if (x == NULL
       || x->next == NULL
       || x->type != T_SYMBOL) {
-    return make_error("Invalid params for operation DEF");
+    return make_error(ERR_FUNCTION_X_EXPECTS_Y, "def", "a symbol and a list");
   }
 
   Element *error = _validate_symbol(x);
   if (error) { return error; }
 
   // TODO: check whether x can be changed
-  return make_error("`DEF` not implemented.");
+  return make_error(ERR_FUNCTION_X_NOT_IMPLEMENTED, "def");
   //return x->next;
 }
 
 Element *reference(Env *env, Element *x) {
   if (x == NULL || x->type != T_SYMBOL) {
-    return make_error("Invalid params for operation REF");
+    return make_error(ERR_FUNCTION_X_EXPECTS_Y, "ref", "a symbol");
   }
 
   // TODO: check whether e/e->tail/e->sub can be changed

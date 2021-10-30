@@ -7,7 +7,7 @@
 
 Element *elmt_foreach(Env *env, Element *e) {
   if (!e || !e->next) {
-    return make_error("Expect at least 2 element for FOREACH.");
+    return make_error(ERR_FUNCTION_X_EXPECTS_Y, "foreach", "at least 2 elements");
   }
 
   Element *items = make_copy(e);

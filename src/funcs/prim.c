@@ -11,16 +11,16 @@ Element *prim_quote(Element *x) {
 }
 
 Element *prim_atom(Element *x) {
-  if (!x) { return make_error("Cannot call ATOM on NULL list."); }
+  if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "atom"); }
   if (x->type == T_ERROR
       || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
-    return make_error("Unsupported type %d for prim function ATOM.", x->type);
+    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "atom", TYPES[x->type]);
   }
 
   if (x->next) {
-    return make_error("Expect 1 element for operation ATOM.");
+    return make_error(ERR_FUNCTION_X_EXPECTS_Y, "atom", "1 element");
   } else if (x->type == T_NONE
              || x->type == T_INTEGER
              || x->type == T_STRING) {
@@ -37,16 +37,16 @@ Element *prim_atom(Element *x) {
 }
 
 Element *prim_eq(Element *x) {
-  if (!x) { return make_error("Cannot call EQ on NULL list."); }
+  if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "eq"); }
   if (x->type == T_ERROR
       || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
-    return make_error("Unsupported type %d for prim function EQ.", x->type);
+    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "eq", TYPES[x->type]);
   }
 
   if (x && x->next && x->next->next) {
-    return make_error("Expect 2 elements for operation EQ.");
+    return make_error(ERR_FUNCTION_X_EXPECTS_Y, "eq", "2 elements");
   }
 
   if (x && x->next) {
@@ -73,17 +73,17 @@ Element *prim_eq(Element *x) {
     else {return make_integer(0);}
   }
 
-  return make_error("Expect two elements for operation EQ.");
+  return make_error(ERR_FUNCTION_X_EXPECTS_Y, "eq", "2 elements");
 }
 
 Element *prim_car(Element *x) {
-  if (!x) { return make_error("Cannot call CAR on NULL list."); }
+  if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "car"); }
   if (x->type == T_NONE
       || x->type == T_ERROR
       || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
-    return make_error("Unsupported type %d for prim function CAR.", x->type);
+    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "car", TYPES[x->type]);
   } else if (x->type == T_LISTHEAD && x->next == NULL) {
     return prim_car(x->sub);
   }
@@ -93,13 +93,13 @@ Element *prim_car(Element *x) {
 }
 
 Element *prim_cdr(Element *x) {
-  if (!x) { return make_error("Cannot call CDR on NULL list."); }
+  if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "cdr"); }
   if (x->type == T_NONE
       || x->type == T_ERROR
       || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
-    return make_error("Unsupported type %d for prim function CDR.", x->type);
+    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "cdr", TYPES[x->type]);
   } else if (x->type == T_LISTHEAD && x->next == NULL) {
     return prim_cdr(x->sub);
   }
@@ -107,21 +107,21 @@ Element *prim_cdr(Element *x) {
 }
 
 Element *prim_cons(Element *x) {
-  if (!x) { return make_error("Cannot call CONS on NULL list."); }
+  if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "cons"); }
   if (x->type == T_NONE
       || x->type == T_ERROR
       || x->type == T_FUNC
       || x->type == T_LAMBDA
       || x->type == T_SYMBOL) {
-    return make_error("Unsupported type %d for prim function CONS.", x->type);
+    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "cons", TYPES[x->type]);
   }
 
   Element *y = x->next;
   if (!y || y->type != T_LISTHEAD){
-    return make_error("Expect 2nd element to be a list for function CONS.");
+    return make_error(ERR_FUNCTION_X_EXPECTS_Y, "cons", "the 2nd elements to be a list");
   }
   if (y->next) {
-    return make_error("Expect 2 elements for function CONS.");
+    return make_error(ERR_FUNCTION_X_EXPECTS_Y, "cons", "2 elements");
   }
 
   x->next = y->sub;
@@ -135,7 +135,7 @@ Element *prim_cons(Element *x) {
 }
 
 Element *prim_cond(Element *x) {
-  if (!x) { return make_error("Cannot call CONS on NULL list."); }
+  if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "cond"); }
   int i = 0;
   while (x) {
     if (!x->next) { return x; }
@@ -144,7 +144,8 @@ Element *prim_cond(Element *x) {
         || x->type == T_FUNC
         || x->type == T_LAMBDA
         || x->type == T_SYMBOL) {
-      return make_error("Expect the %dth element to be an atom for COND.", i);
+
+      return make_error(ERR_FUNCTION_COND_EXPECTS_ATOM_AT_X, i);
     }
 
     boolean cond = false;
@@ -161,5 +162,5 @@ Element *prim_cond(Element *x) {
     x = x->next->next;
     i += 2;
   }
-  return make_error("Unexpected error for operation COND.");
+  return make_error(ERR_UNEXPECTED_FOR_X, "cond");
 }
