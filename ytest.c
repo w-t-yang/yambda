@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
   } else {
     FILE *in = fopen(argv[1] , "r");
     if (!in) { throw("File not found."); }
-    set_instream(&in);
+    set_instream(&in, argv[1]);
   }
   p("Test file: %s", argv[1]);
 
@@ -24,6 +24,9 @@ int main(int argc, char **argv) {
     Element *e2 = eval(env, l2);
 
     boolean failed = !lsteq(e1, e2);
+    /* p("--------------"); */
+    /* p("L1: "); plst(l1); */
+    /* p("L2: "); plst(l2); */
     if (failed) {
       failed_cnt++;
       p("The following test failed");

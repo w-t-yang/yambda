@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
   } else {
     FILE *in = fopen(argv[1] , "r");
     if (!in) { throw("File not found."); }
-    set_instream(&in);
+    set_instream(&in, argv[1]);
   }
 
   Env *env = env_init();

@@ -24,6 +24,18 @@ Element *make_none() {
 }
 
 Element *_make_error(char *buffer) {
+  // TODO: Getting the context can be needed in 2 cases
+  // One is at parsing time. When any vialation occurs, we can get the context
+  // immediately from the file pointer.
+  // Another one is at evaluation.
+  // The 2nd is harder to provide the context, because the text has already
+  // been parsed. Reading from input won't give and right context.
+  // A potential solution is to store the context for each symbol,
+  // but it will introduce extra space overhead
+  /* char *ctx = get_error_context(); */
+  /* char *ctx = ""; */
+  /* Element *ele = alloc(T_ERROR, EXTRA_SPACE + strlen(ctx)); */
+  /* sprintf(ele->str_v, "%s Error: %s", ctx, buffer); */
   Element *ele = alloc(T_ERROR, EXTRA_SPACE);
   strcpy(ele->str_v, buffer);
   return ele;

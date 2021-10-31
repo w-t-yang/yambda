@@ -57,9 +57,6 @@ Element *_env_unset(Env *env, char *symbol) {
 
 Element *env_set(Env *env, char *symbol, Element *list) {
   // TODO: Whenever setting an env node, we need to make a deep copy of the list
-  if (strlen(symbol) == 0) {
-    return make_error(ERR_SYMBOL_X_INVALID, symbol);
-  }
   if (!env) {
     return make_error(ERR_ENV_NOT_INITED);
   }

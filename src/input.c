@@ -9,13 +9,27 @@
 Element *read_list();
 
 FILE **_in;
+char *_fname;
+int _row = 1;
+int _pre_col = 0;
+int _col = 0;
+#define EXTRA_SPACE_IN_CTX_STRING 50
 
-void set_instream(FILE **f) {
+void set_instream(FILE **f, char *fname) {
   _in = f;
+  _fname = fname;
 }
 
 char _getc() {
   char c = getc(*_in);
+  if (c == '\r' || c == '\n') {
+    _row++;
+    _pre_col = _col;
+    _col = 0;
+  } else {
+    _col++;
+  }
+
   if (c == '#') {
     while(c != '\r' && c != '\n' && c != EOF) {
       c = _getc();
@@ -25,6 +39,12 @@ char _getc() {
 }
 
 void _ungetc(char c) {
+  if (c == '\r' || c == '\n') {
+    _row--;
+    _col = _pre_col;
+  } else {
+    if (_col > 0) { _col--; }
+  }
   ungetc(c, *_in);
 }
 
@@ -52,9 +72,25 @@ void _kill_line_with_msg(int size, char **buffer) {
     }
     c = _getc();
   }
-  c = _getc();
+  _ungetc(c);
   (*buffer)[index] = '\0';
 }
+
+#define MSG_BUFFER_SIZE 20
+char *_get_error_context() {
+  int row = _row;
+  int col = _col;
+
+  char *ctx = malloc(MSG_BUFFER_SIZE);
+  _kill_line_with_msg(MSG_BUFFER_SIZE, &ctx);
+
+  char *msg = malloc(strlen(_fname)
+                     + EXTRA_SPACE_IN_CTX_STRING
+                     + MSG_BUFFER_SIZE);
+  sprintf(msg, "%s(%d,%d) \"...%s...\"", _fname, row, col, ctx);
+  return msg;
+}
+#define CTX _get_error_context()
 
 int _get_indentation() {
   int ind = 0;
@@ -81,11 +117,8 @@ int _peek_indentation() {
   return ind;
 }
 
-#define MSG_BUFFER_SIZE 10
 Element *_make_indentation_error() {
-  char *msg = malloc(MSG_BUFFER_SIZE);
-  _kill_line_with_msg(MSG_BUFFER_SIZE, &msg);
-  return make_error(ERR_INDENTATION_INVALID_AROUND_X, msg);
+  return make_error(ERR_IN_INDENTATION_INVALID, CTX);
 }
 
 int end_of_element(char c) {
@@ -115,7 +148,7 @@ Element *read_integer() {
       _ungetc(c);
 
       if (strlen(buffer) == 0) {
-        return make_error(ERR_INTEGER_X_INVALID, buffer);
+        return make_error(ERR_IN_INTEGER_X_INVALID, CTX, buffer);
       } else {
         int i = atoi(buffer);
         if (isnegative) { i = -i; }
@@ -126,7 +159,7 @@ Element *read_integer() {
         strncat(buffer, &c, 1);
       } else {
         strncat(buffer, &c, 1);
-        return make_error(ERR_INTEGER_X_INVALID, buffer);
+        return make_error(ERR_IN_INTEGER_X_INVALID, CTX, buffer);
       }
     }
   }
@@ -140,18 +173,18 @@ Element *read_string() {
   for (;;) {
     char c = _getc();
     if (c == EOF) {
-      return make_error(ERR_STRING_EOF_REACHED);
+      return make_error(ERR_IN_STRING_EOF_REACHED, CTX);
     } else if (c == quote) {
       if (end_of_element(peek())){
         return make_string(buffer);
       } else {
-        return make_error(ERR_STRING_END_WITHOUT_WHITESPACE);
+        return make_error(ERR_IN_STRING_END_WITHOUT_WHITESPACE, CTX);
       }
     } else if ( c == '\\') {
       strncat(buffer, &c, 1);
       c = _getc();
       if (c == EOF) {
-        return make_error(ERR_STRING_EOF_REACHED);
+        return make_error(ERR_IN_STRING_EOF_REACHED, CTX);
       }
       strncat(buffer, &c, 1);
     } else {
@@ -222,19 +255,18 @@ Element *read_list() {
     Element *ele = NULL;
 
     if (c == '\t') {
-      return make_error(ERR_FORMAT_NO_SLASH_T);
+      return make_error(ERR_IN_FORMAT_NO_SLASH_T, CTX);
     }
 
     if (start_with_parenthesis) {
       if (c == EOF) {
-        return make_error(ERR_PAREN_INVALID);
+        return make_error(ERR_IN_PAREN_INVALID, CTX);
       } else if (c == ')') {
         _getc();
         Element *lh = make_list_head();
         lh->sub = head;
         return lh;
       } else if (c == '\n' || c == '\r') {
-        // TODO: support indentation
         _getc();
         continue;
       } else if (c == ' ') {
@@ -242,15 +274,15 @@ Element *read_list() {
         continue;
       } else {
         ele = read_element();
+        if (ele->type == T_ERROR) { return ele; }
       }
     } else {
       if (c == EOF) {
         return head;
       } else if (c == ')') {
         _getc();
-        return make_error(ERR_PAREN_INVALID);
+        return make_error(ERR_IN_PAREN_INVALID, CTX);
       } else if (c == '\n' || c == '\r') {
-        // TODO: support indentation
         _getc();
         return head;
       } else if (c == ' ') {
@@ -258,6 +290,7 @@ Element *read_list() {
         continue;
       } else {
         ele = read_element();
+        if (ele->type == T_ERROR) { return ele; }
       }
     }
 
