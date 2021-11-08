@@ -45,7 +45,7 @@ Element *call_func(Env *env, Element *head) {
   case K_CONS:
     return prim_cons(list);
   case K_COND:
-    return prim_cond(list);
+    return prim_cond(env, list);
 
   case K_FOREACH:
     return elmt_foreach(env, list);
@@ -125,27 +125,32 @@ Element *pre_eval(Env *env, Element *source) {
   // TODO: optimize the use of make_deep_copy when pre-evaluating a list
   Element *head = make_deep_copy(source);
 
+  // Remove pointer symbols
   while (head && _is_pointer_symbol(head)) {
     head = head->next;
   }
 
-  Element *curr = head;
-  Element *prev = NULL;
+  Element *curr = head->next;
+  Element *prev = head;
+  while (curr) {
+    if (curr->type == T_SYMBOL && _is_pointer_symbol(curr)) {
+      curr = curr->next;
+      prev->next = curr;
+    } else {
+      prev = curr;
+      curr = curr->next;
+    }
+  }
+
+  curr = head;
+  prev = NULL;
   while (curr) {
     Element *l = NULL;
 
     if (curr->type == T_LISTHEAD) {
       l = eval(env, curr->sub);
     } else if (curr->type == T_SYMBOL) {
-      if (_is_pointer_symbol(curr)) {
-        // Since head of the list cannot be pointer symbol, prev cannot NULL at this point
-        // We need to skip current element
-        curr = curr->next;
-        prev->next = curr;
-        continue;
-      } else {
-        l = reference(env, curr);
-      }
+      l = reference(env, curr);
     }
 
     if (l) {
@@ -164,13 +169,13 @@ Element *pre_eval(Env *env, Element *source) {
         head = l;
         curr = l;
 
-        // If the keyword is let/def/ref/quote/foreach, skip pre_eval the rest of the list
+        // If the keyword is let/def/ref/cond/foreach, skip pre_eval the rest of the list
         if (head->type == T_FUNC &&
             (
              head->int_v == K_LET
              || head->int_v == K_DEF
              || head->int_v == K_REF
-             || head->int_v == K_QUOTE
+             || head->int_v == K_COND
              || head->int_v == K_FOREACH
              ) ) {
 

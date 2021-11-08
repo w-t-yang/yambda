@@ -1,6 +1,7 @@
 #include "prim.h"
 
 #include "../env.h"
+#include "../funcs.h"
 #include "../output.h"
 #include "../utils.h"
 
@@ -134,11 +135,11 @@ Element *prim_cons(Element *x) {
   return h;
 }
 
-Element *prim_cond(Element *x) {
+Element *prim_cond(Env *env, Element *x) {
   if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "cond"); }
   int i = 0;
   while (x) {
-    if (!x->next) { return x; }
+    if (!x->next) { return eval(env, x); }
 
     /* if (x->type == T_ERROR */
     /*     || x->type == T_FUNC */
@@ -148,19 +149,22 @@ Element *prim_cond(Element *x) {
     /*   return make_error(ERR_FUNCTION_COND_EXPECTS_ATOM_AT_X, i); */
     /* } */
 
+    Element *next = x->next->next;
+    Element *y = x->next;
+    x->next = NULL;
+    y->next = NULL;
+    x = eval(env, x);
+
     boolean cond = false;
     if (x->type == T_INTEGER && x->int_v != 0) { cond = true; }
     else if (x->type == T_STRING && !streq(x->str_v, "")) { cond = true; }
     else if (x->type == T_LISTHEAD && x->sub && x->sub->type != T_NONE) { cond = true;}
 
-    if (cond) {
-      Element *r = make_copy(x->next);
-      r->next = NULL;
-      return r;
-    }
+    if (cond) { return eval(env, y); }
 
-    if (!x->next->next) { return none; }
-    x = x->next->next;
+    if (!next) { return none; }
+
+    x = next;
     i += 2;
   }
   return make_error(ERR_UNEXPECTED_FOR_X, "cond");

@@ -36,7 +36,7 @@ Element *elmt_foreach(Env *env, Element *e) {
 }
 
 Element *elmt_print(Element *e) {
-  plst(e);
+  plst_for_script(e);
   printf("\n");
   return make_integer(1);
 }

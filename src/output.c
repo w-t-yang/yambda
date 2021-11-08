@@ -39,7 +39,7 @@ void p(char *fmt, ...){
   va_end(ap);
 }
 
-void print_ele(Element *ele, boolean show_type) {
+void print_ele(Element *ele, boolean show_type, boolean for_script) {
   if (!ele) {
     //throw("Trying to print NULL pointer.");
     printf("NULL ");
@@ -60,7 +60,7 @@ void print_ele(Element *ele, boolean show_type) {
   case T_RETURN:
     printf("(return: ");
     if (ele->sub) {
-      print_list(ele->sub);
+      print_list(ele->sub, for_script);
     } else {
       printf(" ");
     }
@@ -70,7 +70,11 @@ void print_ele(Element *ele, boolean show_type) {
     printf("%d ", ele->int_v);
     break;
   case T_STRING:
-    printf("\"%s\" ", ele->str_v);
+    if (for_script) {
+      printf("%s ", ele->str_v);
+    } else {
+      printf("\"%s\" ", ele->str_v);
+    }
     break;
   case T_SYMBOL:
     printf("%s ", ele->str_v);
@@ -78,7 +82,7 @@ void print_ele(Element *ele, boolean show_type) {
   case T_LISTHEAD:
     printf("(");
     if (ele->sub) {
-      print_list(ele->sub);
+      print_list(ele->sub, for_script);
     } else {
       printf(" ");
     }
@@ -95,17 +99,26 @@ void print_ele(Element *ele, boolean show_type) {
   }
 }
 
-void print_list(Element *curr) {
-  if (!curr) { print_ele(curr, false); }
+void print_list(Element *curr, boolean for_script) {
+  if (!curr) { print_ele(curr, false, for_script); }
 
   while (curr) {
-    print_ele(curr, false);
+    print_ele(curr, false, for_script);
     curr = curr->next;
   }
 }
 
 void plst(Element *curr) {
-  print_list(curr);
+  print_list(curr, false);
+  printf("\n");
+}
+
+void plst_for_script(Element *curr) {
+  if (curr && curr->next == NULL && curr->type == T_LISTHEAD) {
+    print_list(curr->sub, true);
+  } else {
+    print_list(curr, true);
+  }
   printf("\n");
 }
 
@@ -125,7 +138,7 @@ void print_env_node(Env *env) {
   printf("ENV node:");
 
   printf("Symbol: %s\n", env->symbol);
-  print_list(env->list);
+  print_list(env->list, false);
 
   printf("End of ENV node");
 }

@@ -9,6 +9,6 @@ Element *prim_eq(Element *x);
 Element *prim_car(Element *x);
 Element *prim_cdr(Element *x);
 Element *prim_cons(Element *x);
-Element *prim_cond(Element *x);
+Element *prim_cond(Env *env, Element *x);
 
 #endif
