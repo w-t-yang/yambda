@@ -101,6 +101,11 @@ Element *make_lambda(char *buffer) {
   return ele;
 }
 
+Element *make_return_node() {
+  Element *ele = alloc(T_RETURN, 0);
+  return ele;
+}
+
 Element *_copy_node(Element *e) {
   int has_str = (strlen(e->str_v) > 0);
   int bytes_for_str = has_str ? strlen(e->str_v) + 1 - 8 : 0;
@@ -149,7 +154,14 @@ Element *tail_of(Element *head) {
   if (!head) { return NULL; }
   Element *curr = head;
   while (curr->next) {
+    if (curr->type == T_RETURN) {
+      break;
+    }
     curr = curr->next;
+  }
+
+  if (curr->type == T_RETURN) {
+    curr->next = NULL;
   }
   return curr;
 }
@@ -174,6 +186,9 @@ boolean streq(char *x, char *y) {
 
 Element *_extract_list(Element *x) {
   while (x && x->next == NULL && x->type == T_LISTHEAD) {
+    x = x->sub;
+  }
+  if (x && x->type == T_RETURN) {
     x = x->sub;
   }
   return x;

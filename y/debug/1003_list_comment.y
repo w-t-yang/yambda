@@ -7,7 +7,7 @@
 (` 7 8)
 
 print "The next test is expected to fail. Explanation is in the script comments."
-NONE
+1
 
 # The test below is expected to fail
 # Because once it has an unclosed parenthesis,

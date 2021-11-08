@@ -26,7 +26,7 @@ Element *elmt_foreach(Env *env, Element *e) {
   while (items) {
     Element *i = make_copy(items);
     i->next = NULL;
-    Element *arg = env_set(env, "$_", i);
+    env_set(env, "$_", i);
     res = eval(env, code);
     cnt++;
     items = items->next;
@@ -38,5 +38,11 @@ Element *elmt_foreach(Env *env, Element *e) {
 Element *elmt_print(Element *e) {
   plst(e);
   printf("\n");
-  return make_none();
+  return make_integer(1);
+}
+
+Element *elmt_return(Element *e) {
+  Element *res = make_return_node();
+  res->sub = e;
+  return res;
 }

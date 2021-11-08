@@ -7,26 +7,6 @@
 #include "funcs/math.h"
 #include "funcs/prim.h"
 
-Element *apply(Env *env, Element *lambda, Element *args) {
-  Element *res = NULL;
-
-  //env_set(env, ARGS_SYMBOL, args);
-
-  //res = progn(env, lambda);
-  /* while (lambda) { */
-  /*   if (lambda->type == T_EXPRESSION){ */
-  /*     error("Not implemented yet."); */
-  /*   } else { */
-  /*     eval(env, lambda); */
-  /*   } */
-  /*   lambda = lambda->next; */
-  /* } */
-
-  //env_unset(env, ARGS_SYMBOL);
-
-  return res;
-}
-
 Element *call_func(Env *env, Element *head) {
   if (!head) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "eval"); }
   if (head->type != T_FUNC) { return make_error(ERR_FUNCTION_INVALID); }
@@ -71,10 +51,57 @@ Element *call_func(Env *env, Element *head) {
     return elmt_foreach(env, list);
   case K_PRINT:
     return elmt_print(list);
+  case K_RETURN:
+    return elmt_return(list);
 
   default:
     return make_error(ERR_FUNCTION_INT_X_UNKNOWN, head->int_v);
   }
+}
+
+#define MAX_NUM_OF_ARGS 99
+#define MAX_LOCAL_ARG_NAME_LENGTH 4
+#define LOCAL_ARG_ZERO "$0"
+#define LOCAL_ARG_PREFIX '$'
+Element *call_lambda(Env *env, Element *head) {
+  if (!head || head->type != T_LAMBDA) {
+    return make_error(ERR_LAMBDA_INVALID);
+  }
+
+  Element *lambda = head->sub;
+  Element *args = head->next;
+  head->next = NULL;
+  env_set(env, LOCAL_ARG_ZERO, head);
+  int i = 1;
+  while (args) {
+    if (i > MAX_NUM_OF_ARGS - 1) {
+      return make_error(ERR_LAMBDA_TOO_MANY_ARGS, MAX_NUM_OF_ARGS);
+    }
+
+    Element *next = args->next;
+    args->next = NULL;
+
+    char *arg_name = malloc(MAX_LOCAL_ARG_NAME_LENGTH);
+    sprintf(arg_name, "%c%d", LOCAL_ARG_PREFIX, i);
+    // TODO: Should use nested env
+    env_set(env, arg_name, args);
+
+    args = next;
+    i++;
+  }
+
+  Element *res = eval(env, lambda);
+
+  for (int j = 0; j < i; j++) {
+    char *arg_name = malloc(MAX_LOCAL_ARG_NAME_LENGTH);
+    sprintf(arg_name, "%c%d", LOCAL_ARG_PREFIX, j);
+    env_unset(env, arg_name);
+  }
+
+  if (res && res->type == T_RETURN) {
+    res = res->sub;
+  }
+  return res;
 }
 
 boolean _is_pointer_symbol(Element *x) {
@@ -95,6 +122,7 @@ boolean _is_pointer_symbol(Element *x) {
 }
 
 Element *pre_eval(Env *env, Element *source) {
+  // TODO: optimize the use of make_deep_copy when pre-evaluating a list
   Element *head = make_deep_copy(source);
 
   while (head && _is_pointer_symbol(head)) {
@@ -136,7 +164,7 @@ Element *pre_eval(Env *env, Element *source) {
         head = l;
         curr = l;
 
-        // If the keyword is let/def/ref/quote/foreach/print, skip pre_eval the rest of the list
+        // If the keyword is let/def/ref/quote/foreach, skip pre_eval the rest of the list
         if (head->type == T_FUNC &&
             (
              head->int_v == K_LET
@@ -144,11 +172,10 @@ Element *pre_eval(Env *env, Element *source) {
              || head->int_v == K_REF
              || head->int_v == K_QUOTE
              || head->int_v == K_FOREACH
-             || head->int_v == K_PRINT
              ) ) {
 
           // If the keyword is let, pre_eval the value that will be assigned to symbol
-          if ((head->int_v == K_LET || head->int_v == K_DEF)
+          if ((head->int_v == K_LET)
               && head->next
               && head->next->next) {
             Element *r = pre_eval(env, head->next->next);
@@ -160,6 +187,11 @@ Element *pre_eval(Env *env, Element *source) {
       }
     }
 
+    if (curr && curr->type == T_ERROR) {
+      free(curr->next);
+      curr->next = NULL;
+      return curr;
+    }
     prev = curr;
     curr = curr->next;
   }
@@ -175,6 +207,8 @@ Element *eval(Env *env, Element *head) {
   case T_NONE:
     return none;
   case T_ERROR:
+    return head;
+  case T_RETURN:
     return head;
   case T_INTEGER:
     return make_copy(tail_of(head));
@@ -195,8 +229,7 @@ Element *eval(Env *env, Element *head) {
   case T_FUNC:
     return call_func(env, head);
   case T_LAMBDA:
-    //TODO: call_lambda(env, head);
-    return make_error(ERR_FUNCTION_X_NOT_IMPLEMENTED, "lambda");
+    return call_lambda(env, head);
   default:
     return make_error(ERR_ELEMENT_INT_X_UNKNOWN, head->type);
   }

@@ -42,7 +42,7 @@ Element *_env_get(Env *env, char *symbol) {
   return make_error(ERR_SYMBOL_X_NOT_FOUND, symbol);
 }
 
-Element *_env_unset(Env *env, char *symbol) {
+Element *env_unset(Env *env, char *symbol) {
   Env *curr = env;
   while (curr) {
     if (streq(curr->symbol, symbol)) {
@@ -119,8 +119,10 @@ Element *define(Env *env, Element *x) {
   if (error) { return error; }
 
   // TODO: check whether x can be changed
-  return make_error(ERR_FUNCTION_X_NOT_IMPLEMENTED, "def");
-  //return x->next;
+  Element *lambda = make_lambda(x->str_v);
+  lambda->sub = make_deep_copy(x->next);
+  env_set(env, x->str_v, lambda);
+  return lambda;
 }
 
 Element *reference(Env *env, Element *x) {
@@ -132,6 +134,8 @@ Element *reference(Env *env, Element *x) {
   Element *e = _env_get(env, x->str_v);
   if (e && e->type == T_SYMBOL) {
     return reference(env, e);
+  } else if (!e) {
+    return make_error(ERR_SYMBOL_X_NOT_FOUND, x->str_v);
   } else {
     return make_copy(e);
   }

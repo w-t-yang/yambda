@@ -5,5 +5,6 @@
 
 Element *elmt_foreach(Env *env, Element *e);
 Element *elmt_print(Element *e);
+Element *elmt_return(Element *e);
 
 #endif

@@ -57,6 +57,15 @@ void print_ele(Element *ele, boolean show_type) {
   case T_ERROR:
     printf("ERROR: %s ", ele->str_v);
     break;
+  case T_RETURN:
+    printf("(return: ");
+    if (ele->sub) {
+      print_list(ele->sub);
+    } else {
+      printf(" ");
+    }
+    printf("\b) ");
+    break;
   case T_INTEGER:
     printf("%d ", ele->int_v);
     break;
@@ -93,6 +102,11 @@ void print_list(Element *curr) {
     print_ele(curr, false);
     curr = curr->next;
   }
+}
+
+void plst(Element *curr) {
+  print_list(curr);
+  printf("\n");
 }
 
 void print_env(Env *env) {

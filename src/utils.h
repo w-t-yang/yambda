@@ -11,6 +11,7 @@ Element *make_symbol(char *s);
 Element *make_list_head();
 Element *make_func(int index);
 Element *make_lambda(char *s);
+Element *make_return_node();
 
 Element *make_copy(Element *e);
 Element *make_deep_copy(Element *e);

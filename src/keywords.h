@@ -24,6 +24,7 @@ enum {
 
   K_FOREACH,
   K_PRINT,
+  K_RETURN,
 
   KEYWORDS_COUNT,
 };
@@ -52,6 +53,8 @@ static char KEYWORDS[KEYWORDS_COUNT][KEYWORD_MAX_LENGTH] = {
 
   "foreach",
   "print",
+
+  "return",
 };
 
 #endif

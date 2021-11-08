@@ -14,7 +14,7 @@ void print_env_node(Env *env);
 
 void p(char *fmt, ...);
 #define pele(e) print_ele(e, true)
-#define plst print_list
+void plst(Element *curr);
 #define penv print_env
 
 #endif

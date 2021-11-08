@@ -13,6 +13,7 @@ enum {
   // Types of element
   T_NONE = 0,
   T_ERROR,
+  T_RETURN,
   T_INTEGER,
   T_STRING,
   T_SYMBOL,

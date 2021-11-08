@@ -5,6 +5,7 @@
 
 Env *env_init();
 
+Element *env_unset(Env *env, char *symbol);
 Element *env_set(Env *env, char *symbol, Element *list);
 Element *let(Env *env, Element *list);
 Element *define(Env *env, Element *list);

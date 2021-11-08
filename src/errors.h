@@ -21,6 +21,9 @@
 #define ERR_IN_STRING_END_WITHOUT_WHITESPACE "%s End of string should be followed by whitespace."
 #define ERR_IN_STRING_EOF_REACHED "%s Invalid string. End of file reached."
 
+#define ERR_LAMBDA_INVALID "Invalid lambda function."
+#define ERR_LAMBDA_TOO_MANY_ARGS "Lambda function expects no more than %d arguments."
+
 #define ERR_SYMBOL_X_INVALID "Invalid symbol name \"%s\"."
 #define ERR_SYMBOL_X_IS_RESERVED "Cannot use reserved symbol \"%s\"."
 #define ERR_SYMBOL_X_NOT_FOUND "Symbol \"%s\" not found."

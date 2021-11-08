@@ -1,6 +1,3 @@
-def a 1
-ERROR
-
 d
 ERROR
 

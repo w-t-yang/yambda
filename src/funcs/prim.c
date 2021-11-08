@@ -12,12 +12,12 @@ Element *prim_quote(Element *x) {
 
 Element *prim_atom(Element *x) {
   if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "atom"); }
-  if (x->type == T_ERROR
-      || x->type == T_FUNC
-      || x->type == T_LAMBDA
-      || x->type == T_SYMBOL) {
-    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "atom", TYPES[x->type]);
-  }
+  /* if (x->type == T_ERROR */
+  /*     || x->type == T_FUNC */
+  /*     || x->type == T_LAMBDA */
+  /*     || x->type == T_SYMBOL) { */
+  /*   return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "atom", TYPES[x->type]); */
+  /* } */
 
   if (x->next) {
     return make_error(ERR_FUNCTION_X_EXPECTS_Y, "atom", "1 element");
@@ -38,12 +38,12 @@ Element *prim_atom(Element *x) {
 
 Element *prim_eq(Element *x) {
   if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "eq"); }
-  if (x->type == T_ERROR
-      || x->type == T_FUNC
-      || x->type == T_LAMBDA
-      || x->type == T_SYMBOL) {
-    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "eq", TYPES[x->type]);
-  }
+  /* if (x->type == T_ERROR */
+  /*     || x->type == T_FUNC */
+  /*     || x->type == T_LAMBDA */
+  /*     || x->type == T_SYMBOL) { */
+  /*   return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "eq", TYPES[x->type]); */
+  /* } */
 
   if (x && x->next && x->next->next) {
     return make_error(ERR_FUNCTION_X_EXPECTS_Y, "eq", "2 elements");
@@ -78,13 +78,13 @@ Element *prim_eq(Element *x) {
 
 Element *prim_car(Element *x) {
   if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "car"); }
-  if (x->type == T_NONE
-      || x->type == T_ERROR
-      || x->type == T_FUNC
-      || x->type == T_LAMBDA
-      || x->type == T_SYMBOL) {
-    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "car", TYPES[x->type]);
-  } else if (x->type == T_LISTHEAD && x->next == NULL) {
+  /* if (x->type == T_NONE */
+  /*     || x->type == T_ERROR */
+  /*     || x->type == T_FUNC */
+  /*     || x->type == T_LAMBDA */
+  /*     || x->type == T_SYMBOL) { */
+  /*   return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "car", TYPES[x->type]); */
+  /* } else */ if (x->type == T_LISTHEAD && x->next == NULL) {
     return prim_car(x->sub);
   }
   Element *e = make_copy(x);
@@ -94,13 +94,13 @@ Element *prim_car(Element *x) {
 
 Element *prim_cdr(Element *x) {
   if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "cdr"); }
-  if (x->type == T_NONE
-      || x->type == T_ERROR
-      || x->type == T_FUNC
-      || x->type == T_LAMBDA
-      || x->type == T_SYMBOL) {
-    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "cdr", TYPES[x->type]);
-  } else if (x->type == T_LISTHEAD && x->next == NULL) {
+  /* if (x->type == T_NONE */
+  /*     || x->type == T_ERROR */
+  /*     || x->type == T_FUNC */
+  /*     || x->type == T_LAMBDA */
+  /*     || x->type == T_SYMBOL) { */
+  /*   return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "cdr", TYPES[x->type]); */
+  /* } else */ if (x->type == T_LISTHEAD && x->next == NULL) {
     return prim_cdr(x->sub);
   }
   return x->next ? x->next : none;
@@ -108,13 +108,13 @@ Element *prim_cdr(Element *x) {
 
 Element *prim_cons(Element *x) {
   if (!x) { return make_error(ERR_FUNCTION_X_WITH_NULL_LIST, "cons"); }
-  if (x->type == T_NONE
-      || x->type == T_ERROR
-      || x->type == T_FUNC
-      || x->type == T_LAMBDA
-      || x->type == T_SYMBOL) {
-    return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "cons", TYPES[x->type]);
-  }
+  /* if (x->type == T_NONE */
+  /*     || x->type == T_ERROR */
+  /*     || x->type == T_FUNC */
+  /*     || x->type == T_LAMBDA */
+  /*     || x->type == T_SYMBOL) { */
+  /*   return make_error(ERR_FUNCTION_X_WITH_INVALID_TYPE_Y, "cons", TYPES[x->type]); */
+  /* } */
 
   Element *y = x->next;
   if (!y || y->type != T_LISTHEAD){
@@ -140,18 +140,19 @@ Element *prim_cond(Element *x) {
   while (x) {
     if (!x->next) { return x; }
 
-    if (x->type == T_ERROR
-        || x->type == T_FUNC
-        || x->type == T_LAMBDA
-        || x->type == T_SYMBOL) {
+    /* if (x->type == T_ERROR */
+    /*     || x->type == T_FUNC */
+    /*     || x->type == T_LAMBDA */
+    /*     || x->type == T_SYMBOL) { */
 
-      return make_error(ERR_FUNCTION_COND_EXPECTS_ATOM_AT_X, i);
-    }
+    /*   return make_error(ERR_FUNCTION_COND_EXPECTS_ATOM_AT_X, i); */
+    /* } */
 
     boolean cond = false;
     if (x->type == T_INTEGER && x->int_v != 0) { cond = true; }
     else if (x->type == T_STRING && !streq(x->str_v, "")) { cond = true; }
     else if (x->type == T_LISTHEAD && x->sub && x->sub->type != T_NONE) { cond = true;}
+
     if (cond) {
       Element *r = make_copy(x->next);
       r->next = NULL;
