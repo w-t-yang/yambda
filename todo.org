@@ -1,15 +1,15 @@
 * Yambda
 
-** Next beta release [3/9]
+** Next beta release [8/9] Nov 7th, 2021
   - [X] Indentation
-  - [ ] Lambda
-  - [ ] Forloop
+  - [X] Lambda
+  - [X] Forloop
   - [X] Test framework
-  - [ ] Print
+  - [X] Print
   - [X] Comparison of list
-  - [ ] Review errors - print str instead of integer of type
-  - [ ] Provide error context and line number
-  - [ ] Code comments
+  - [X] Review errors - print str instead of integer of type
+  - [-] Provide error context and line number
+  - [X] Code comments
 
 ** TODOS
 
@@ -20,8 +20,16 @@
      :LOGBOOK:
      - State "DONE"       from "TODO"       [2021-10-25 Mon 01:29]
      :END:
-**** TODO Define and call lambda function
-**** TODO Forloop
+**** DONE Define and call lambda function
+     CLOSED: [2021-11-07 Sun 18:21]
+     :LOGBOOK:
+     - State "DONE"       from "TODO"       [2021-11-07 Sun 18:21]
+     :END:
+**** DONE Forloop
+     CLOSED: [2021-10-27 Wed 00:49]
+     :LOGBOOK:
+     - State "DONE"       from "TODO"       [2021-10-27 Wed 00:49]
+     :END:
 **** TODO Tries and hashmap
 **** TODO Nested env
 **** DONE Comparison of list
@@ -38,19 +46,26 @@
 **** TODO member accessor, e.g. (123).to_str(args)
 **** TODO Import and evaluate file
 **** TODO String manipulation
+**** TODO List manipulation
+**** TODO Support array - fetching item by index
+**** TODO Optimization, precompile/pre-eval
+**** TODO '=', allow the use of = after a valid symbol
 
 *** Bugfix and nice to have
 
-**** TODO Utility functions [2/9]
-     - [ ] print
+**** TODO Utility functions [7/10]
+     - [X] print
      - [X] test framework
      - [ ] deep copy
      - [ ] deep free
      - [ ] symbol/str/integer conversion
-     - [ ] review errors - print str instead of integer of type
+     - [X] review errors - print str instead of integer of type
      - [X] indentation error with context
-     - [ ] line number
-     - [ ] code comments
+     - [X] error with context at parsing
+     - [ ] error context at evaluating
+     - [X] line number at parsing
+     - [ ] line number at evaluating
+     - [X] code comments
 
 **** TODO Garbage collection
 
